@@ -20,4 +20,9 @@ RSpec.describe MarkdownPPConverter do
     expect(convert_sample('nested_ulist.adoc'))
       .to eq File.read(FIXTURES.join('expected', 'nested_ulist.md'))
   end
+  
+  it 'renders nested ordered lists' do
+    expect(convert_sample('nested_olist.adoc'))
+      .to eq File.read(FIXTURES.join('expected', 'nested_olist.md'))
+  end
 end

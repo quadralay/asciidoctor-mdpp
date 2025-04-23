@@ -9,6 +9,17 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     respond_to?(method) ? send(method, node) : "<!-- TODO: #{transform} -->"
   end
 
+  # Render an ordered list with proper indentation for nested levels
+  def convert_olist(olist)
+    # indent list items based on nesting level (two spaces per level)
+    indent = '  ' * (olist.level - 1)
+    olist.items.each_with_index.map do |li, idx|
+      # render item and indent subsequent lines
+      body = convert(li, 'list_item').gsub(/\n/, "\n#{indent}  ")
+      "#{indent}#{idx + 1}. #{body}"
+    end.join("\n")
+  end
+
   def convert_document(doc)
     warn "suffix=#{outfilesuffix}" if respond_to?(:outfilesuffix)
     ([convert(doc.header, 'header')] +
