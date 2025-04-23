@@ -8,7 +8,7 @@ def convert_sample(name)
     FIXTURES.join('samples', name),
     backend: 'mdpp',
     safe: :safe,
-    require: 'asciidoctor/mdpp',
+    require: 'asciidoctor/converter/mdpp',
     attributes: {'outfilesuffix' => '.md'},
     header_footer: true,
     to_file: false

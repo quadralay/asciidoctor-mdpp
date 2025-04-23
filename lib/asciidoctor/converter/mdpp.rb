@@ -21,7 +21,6 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
   end
 
   def convert_document(doc)
-    warn "suffix=#{outfilesuffix}" if respond_to?(:outfilesuffix)
     ([convert(doc.header, 'header')] +
      doc.blocks.map { |b| convert b }).compact.join("\n\n")
   end
