@@ -1,0 +1,19 @@
+= Demo Document
+Tony McDow
+:doctype: article
+:toc:
+
+== First section
+
+AsciiDoc is *really* easy to try.
+
+* Bullet 1
+** Bullet 1.1
+*** Bullet 1.1.1
+*** Bullet 1.1.2
+** Bullet 1.2
+* Bullet 2
+
+[source,ruby]
+puts "Hello, WebWorks!"
+

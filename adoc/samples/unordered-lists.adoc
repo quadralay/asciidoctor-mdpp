@@ -1,0 +1,34 @@
+= Sample Document
+Author Name
+:toc:
+
+This document tests nested unordered lists.
+
+== Test Section
+
+Here’s a top‐level introduction before the list.
+
+* Level 1 item A
+** Level 2 item A.1
+*** Level 3 item A.1.a
+**** Level 4 item A.1.a.i
+** Level 2 item A.2
+* Level 1 item B
+
+// An open block to attach a paragraph under Level 1 item C
+* Level 1 item C
++
+--
+** Level 2 item C.1
+*** Level 3 item C.1.a
+--
++ This paragraph is attached to “Level 1 item C” (not to the nested list).
+
+* Level 1 item D
+** Level 2 item D.1
++ A continuation paragraph for “Level 2 item D.1”
+** Level 2 item D.2
+
+// Another top‐level list after a blank line
+
+* Final Level 1 item
