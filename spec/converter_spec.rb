@@ -25,4 +25,9 @@ RSpec.describe MarkdownPPConverter do
     expect(convert_sample('nested_olist.adoc'))
       .to eq File.read(FIXTURES.join('expected', 'nested_olist.md'))
   end
+  
+  it 'renders admonitions' do
+    expect(convert_sample('admonitions.adoc'))
+      .to eq File.read(FIXTURES.join('expected', 'admonitions.md'))
+  end
 end
