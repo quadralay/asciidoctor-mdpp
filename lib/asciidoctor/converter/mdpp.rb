@@ -14,9 +14,12 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     # indent list items based on nesting level (two spaces per level)
     indent = '  ' * (olist.level - 1)
     olist.items.each_with_index.map do |li, idx|
-      # render item and indent subsequent lines
-      body = convert(li, 'list_item').gsub(/\n/, "\n#{indent}  ")
-      "#{indent}#{idx + 1}. #{body}"
+      index = idx + 1
+      prefix = "#{indent}#{index}. "
+      # convert item and indent subsequent lines to align under the text
+      converted = convert(li, 'list_item')
+      body = converted.gsub(/\n/, "\n" + ' ' * prefix.length)
+      "#{prefix}#{body}"
     end.join("\n")
   end
 
