@@ -1,5 +1,5 @@
-# Sample Document – Ordered Lists
-================================
+Sample Document – Ordered Lists
+===============================
 
 This document tests nested ordered lists.
 

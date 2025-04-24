@@ -2,6 +2,8 @@
 
 This document tests section linking.
 
+This is a <<my_custom_alias, link to custom alias>>.
+
 [[my_custom_alias]]
 == Section
 
