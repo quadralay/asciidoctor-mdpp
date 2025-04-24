@@ -1,0 +1,8 @@
+= Sample Document
+
+This document tests section linking.
+
+[[my_custom_alias]]
+== Section
+
+This is section content.

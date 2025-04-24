@@ -28,8 +28,21 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
      doc.blocks.map { |b| convert b }).compact.join("\n\n")
   end
 
+  # Render a section header, and include an explicit anchor comment if an id was set via a block anchor
   def convert_section(sec)
-    (['#' * sec.level + ' ' + sec.title] + sec.blocks.map { |b| convert b }).compact.join("\n\n")
+    # Build the Markdown header line
+    header = '#' * sec.level + ' ' + sec.title
+    parts = []
+    # If the section has an explicit id attribute (e.g., via [[id]]), emit it as a comment
+    if sec.attributes.key?('id')
+      parts << "<!-- ##{sec.id} -->"
+    end
+    parts << header
+    # Convert child blocks of the section
+    sec.blocks.each do |b|
+      parts << convert(b)
+    end
+    parts.compact.join("\n\n")
   end
   def convert_paragraph(par) ; par.lines.join "\n"                   ; end
   
@@ -51,6 +64,22 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
       parts << convert(b)
     end
     parts.join("\n")
+  end
+  
+  # Render inline anchor macros: xrefs and explicit anchors
+  def convert_inline_anchor(node)
+    case node.type
+    when :xref
+      # Render cross-reference as a Markdown++ link
+      text = node.text || node.target
+      "[#{text}](##{node.target})"
+    when :ref
+      # Render an explicit anchor id as a comment
+      "<!-- ##{node.id} -->"
+    else
+      # Unknown inline anchor, omit
+      ""
+    end
   end
   
   # Render an admonition block as a Markdown++ styled block
