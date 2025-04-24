@@ -1,5 +1,5 @@
 Sample Document – Admonitions
-==============================
+=============================
 
 This document tests admonition blocks.
 
