@@ -30,26 +30,40 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     end.join("\n")
   end
 
+  # Render the document: title and top-level blocks (preamble, sections, etc.)
   def convert_document(doc)
-    ([convert(doc.header, 'header')] +
-     doc.blocks.map { |b| convert b }).compact.join("\n\n")
+    parts = []
+    # Render document title (level-0 header)
+    parts << convert(doc.header, 'header')
+    # Render each top-level block (includes preamble and sections)
+    doc.blocks.each do |blk|
+      parts << convert(blk)
+    end
+    parts.compact.join("\n\n")
+  end
+
+  # Render the document preamble (blocks before the first section)
+  def convert_preamble(preamble)
+    # Convert each child block in the preamble
+    preamble.blocks.map { |blk| convert(blk) }.compact.join("\n\n")
   end
 
   # Render a section header, and include an explicit anchor comment if an id was set via a block anchor
   def convert_section(sec)
     # Build the Markdown header line
-    header = '#' * sec.level + ' ' + sec.title
-    parts = []
-    # If the section has an explicit id attribute (e.g., via [[id]]), emit it as a comment
+    header_line = '#' * sec.level + ' ' + sec.title
+    # Start with optional anchor comment
+    output = ''
     if sec.attributes.key?('id')
-      parts << "<!-- ##{sec.id} -->"
+      output << "<!-- ##{sec.id} -->\n"
     end
-    parts << header
-    # Convert child blocks of the section
+    # Add the header
+    output << header_line
+    # Append child blocks, separated by a blank line
     sec.blocks.each do |b|
-      parts << convert(b)
+      output << "\n\n" << convert(b)
     end
-    parts.compact.join("\n\n")
+    output
   end
   # Render a paragraph, processing inline macros (anchors, xrefs, etc.)
   def convert_paragraph(par)
