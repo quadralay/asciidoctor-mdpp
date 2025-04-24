@@ -1,6 +1,7 @@
-<!-- TODO: header -->
+Sample Document – Admonitions
+==============================
 
-<!-- TODO: preamble -->
+This document tests admonition blocks.
 
 # Test Section
 

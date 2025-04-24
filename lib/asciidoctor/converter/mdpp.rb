@@ -9,6 +9,13 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     respond_to?(method) ? send(method, node) : "<!-- TODO: #{transform} -->"
   end
 
+  # Render the document title (from = Title) as a Markdown++ setext header
+  def convert_header(header)
+    title = header.title
+    underline = '=' * title.length
+    "#{title}\n#{underline}"
+  end
+
   # Render an ordered list with proper indentation for nested levels
   def convert_olist(olist)
     # indent list items based on nesting level (two spaces per level)
@@ -44,7 +51,10 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     end
     parts.compact.join("\n\n")
   end
-  def convert_paragraph(par) ; par.lines.join "\n"                   ; end
+  # Render a paragraph, processing inline macros (anchors, xrefs, etc.)
+  def convert_paragraph(par)
+    par.content
+  end
   
   # Render an unordered list with proper indentation for nested levels
   def convert_ulist(ulist)

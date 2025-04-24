@@ -1,6 +1,9 @@
-<!-- TODO: header -->
+Sample Document
+===============
 
-<!-- TODO: preamble -->
+This document tests section linking.
+
+This is a [link to custom alias].
 
 <!-- #my_custom_alias -->
 
