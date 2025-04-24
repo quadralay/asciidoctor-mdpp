@@ -35,4 +35,9 @@ RSpec.describe MarkdownPPConverter do
     expect(convert_sample('section_linking.adoc'))
       .to eq File.read(FIXTURES.join('expected', 'section_linking.md'))
   end
+  
+  it 'renders images' do
+    expect(convert_sample('images.adoc'))
+      .to eq File.read(FIXTURES.join('expected', 'images.md'))
+  end
 end

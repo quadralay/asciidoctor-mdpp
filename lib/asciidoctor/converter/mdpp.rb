@@ -65,9 +65,20 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     end
     output
   end
-  # Render a paragraph, processing inline macros (anchors, xrefs, etc.)
+  # Render a paragraph. Handle inline image macros specially, otherwise process inline macros.
   def convert_paragraph(par)
-    par.content
+    # If the paragraph contains an inline image macro, convert it manually
+    if par.lines.any? { |line| line.include? 'image:' } && par.lines.any? { |line| line.match(/image:[^\[]+\[[^\]]+\]/) }
+      text = par.lines.join("\n")
+      # Replace inline image macros: image:src[alt,width,height]
+      text.gsub(/image:(\S+?)\[([^,\]]+),(\d+),(\d+)\]/) do
+        src, alt, w, h = $1, $2, $3, $4
+        "![#{alt}](#{src}){width=#{w} height=#{h}}"
+      end
+    else
+      # Process inline macros (anchors, xrefs, etc.)
+      par.content
+    end
   end
   
   # Render an unordered list with proper indentation for nested levels
@@ -106,6 +117,25 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
       ""
     end
   end
+  
+  # Render a block-level image as a Markdown image with optional dimensions
+  def convert_image(node)
+    # alt text or title (fallback to first positional attribute)
+    alt = node.attr('alt') || node.attr('title') || node.attributes[1] || ''
+    # image source URL or path: use node.target for inline images, block images store in attribute
+    src = node.inline? ? node.target : node.attr('target')
+    # dimensions (fallback to positional attributes if named not present)
+    width = node.attr('width') || node.attributes[2]
+    height = node.attr('height') || node.attributes[3]
+    dims = []
+    dims << "width=#{width}" if width
+    dims << "height=#{height}" if height
+    attr_str = dims.empty? ? '' : "{#{dims.join ' '}}"
+    "![#{alt}](#{src})#{attr_str}"
+  end
+
+  # Render an inline image using the same logic as block-level image
+  alias convert_inline_image convert_image
   
   # Render an admonition block as a Markdown++ styled block
   # Emit a style comment and a blockquote for each content line

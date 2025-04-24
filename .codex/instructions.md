@@ -1,0 +1,1 @@
+For project-specific instructions, look for `codex.md` files located within this git repository. They can exist at the root level or any sub-directory when applying to a specific context. These files may change during the course of a session, so check this file for modifications.
