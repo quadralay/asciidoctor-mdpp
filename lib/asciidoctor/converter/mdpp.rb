@@ -53,15 +53,16 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     parts.join("\n")
   end
   
-  # Render an admonition block as a Markdown blockquote with a bold caption
+  # Render an admonition block as a Markdown++ styled block
+  # Emit a style comment and a blockquote for each content line
   def convert_admonition(node)
-    # node.caption yields the admonition name (e.g., NOTE, TIP, WARNING)
-    caption = node.caption
-    # Render child blocks and join their converted content
+    # Build style tag (e.g., AdmonitionNote, AdmonitionTip)
+    style = "Admonition#{node.caption}"
+    # Render child blocks and join their content lines
     content = node.blocks.map { |b| convert(b) }.join("\n")
-    # Prefix each content line with blockquote marker
+    # Quote each line of the content
     quoted = content.lines.map { |line| "> #{line.chomp}" }.join("\n")
-    # First line is the bold caption
-    "> **#{caption}**\n" + quoted
+    # Prepend style comment
+    "<!-- style:#{style} -->\n" + quoted
   end
 end
