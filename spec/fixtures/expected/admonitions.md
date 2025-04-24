@@ -4,8 +4,9 @@
 
 # Test Section
 
-> **Note**
+<!-- style:AdmonitionNote -->
 > This is a note.
+> Second line.
 
-> **Tip**
+<!-- style:AdmonitionTip -->
 > This is a tip.
