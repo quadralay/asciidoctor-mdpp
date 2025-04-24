@@ -40,4 +40,9 @@ RSpec.describe MarkdownPPConverter do
     expect(convert_sample('images.adoc'))
       .to eq File.read(FIXTURES.join('expected', 'images.md'))
   end
+  
+  it 'renders nested blocks' do
+    expect(convert_sample('nested_blocks.adoc'))
+      .to eq File.read(FIXTURES.join('expected', 'nested_blocks.md'))
+  end
 end

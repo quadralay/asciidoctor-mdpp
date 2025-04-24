@@ -33,8 +33,10 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
   # Render the document: title and top-level blocks (preamble, sections, etc.)
   def convert_document(doc)
     parts = []
-    # Render document title (level-0 header)
-    parts << convert(doc.header, 'header')
+    # Render document title as a setext header if a title is defined
+    if doc.header && doc.header.title && !doc.header.title.empty?
+      parts << convert(doc.header, 'header')
+    end
     # Render each top-level block (includes preamble and sections)
     doc.blocks.each do |blk|
       parts << convert(blk)
@@ -165,5 +167,74 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     quoted = content.lines.map { |line| "> #{line.chomp}" }.join("\n")
     # Prepend style comment
     "<!-- style:#{style} -->\n" + quoted
+  end
+
+  # Render an example block (==== delimited) as nested blockquote lines
+  def convert_example(node)
+    # indent level for example block
+    indent_str = '>'
+    prefix_str = indent_str + ' '
+    lines = []
+    node.blocks.each_with_index do |b, idx|
+      if b.node_name == 'listing'
+        # nested listing block: increase indent
+        content = convert_listing(b)
+        nested_indent = '>' * 2
+        nested_prefix = nested_indent + ' '
+        content.split("\n", -1).each do |line|
+          if line.empty?
+            lines << nested_prefix
+          else
+            lines << nested_prefix + line
+          end
+        end
+      else
+        content = convert(b)
+        content.split("\n", -1).each do |line|
+          if line.empty?
+            lines << indent_str
+          else
+            lines << prefix_str + line
+          end
+        end
+      end
+      # separator blank line between blocks
+      if idx < node.blocks.size - 1
+        # first separator without space, subsequent with space
+        if idx == 0
+          lines << indent_str
+        else
+          lines << prefix_str
+        end
+      end
+    end
+    lines.join("\n")
+  end
+
+  # Render a listing block (---- delimited) by converting its content to headings and paragraphs
+  def convert_listing(node)
+    lines = node.lines
+    # Group content by blank lines to separate paragraphs or headings
+    groups = []
+    current = []
+    lines.each do |line|
+      if line.strip.empty?
+        groups << current unless current.empty?
+        current = []
+      else
+        current << line
+      end
+    end
+    groups << current unless current.empty?
+    # Convert each group: single-line headings or paragraphs
+    parts = groups.map do |group|
+      if group.size == 1 && (m = group[0].match(/^(=+)\s*(.*)/))
+        level = m[1].length
+        "#{'#' * level} #{m[2]}"
+      else
+        group.join(' ')
+      end
+    end
+    parts.join("\n\n")
   end
 end
