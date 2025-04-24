@@ -96,7 +96,8 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     when :xref
       # Render cross-reference as a Markdown++ link
       text = node.text || node.target
-      "[#{text}](##{node.target})"
+      # node.target may include a leading '#', so do not add an extra
+      "[#{text}](#{node.target})"
     when :ref
       # Render an explicit anchor id as a comment
       "<!-- ##{node.id} -->"
