@@ -70,10 +70,23 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     # If the paragraph contains an inline image macro, convert it manually
     if par.lines.any? { |line| line.include? 'image:' } && par.lines.any? { |line| line.match(/image:[^\[]+\[[^\]]+\]/) }
       text = par.lines.join("\n")
-      # Replace inline image macros: image:src[alt,width,height]
-      text.gsub(/image:(\S+?)\[([^,\]]+),(\d+),(\d+)\]/) do
-        src, alt, w, h = $1, $2, $3, $4
-        "![#{alt}](#{src}){width=#{w} height=#{h}}"
+      # Replace inline image macros: image:src[alt[,width[,height]]]
+      text.gsub(/image:(\S+?)\[([^\]]+)\]/) do
+        src = $1
+        # Split parameters: alt, width, height
+        params = $2.split(',')
+        alt = params[0]
+        width = params[1]
+        height = params[2]
+        # Build style name (e.g., w250h350, w250, h350)
+        style_parts = []
+        style_parts << "w#{width}" if width && !width.empty?
+        style_parts << "h#{height}" if height && !height.empty?
+        style = style_parts.join
+        # Build image markdown
+        img = "![#{alt}](#{src})"
+        # Prepend style comment if dimensions given
+        style.empty? ? img : "<!-- style:#{style} -->#{img}"
       end
     else
       # Process inline macros (anchors, xrefs, etc.)
@@ -127,11 +140,15 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     # dimensions (fallback to positional attributes if named not present)
     width = node.attr('width') || node.attributes[2]
     height = node.attr('height') || node.attributes[3]
-    dims = []
-    dims << "width=#{width}" if width
-    dims << "height=#{height}" if height
-    attr_str = dims.empty? ? '' : "{#{dims.join ' '}}"
-    "![#{alt}](#{src})#{attr_str}"
+    # Build style name for dimensions (e.g., w250h350, w250, h350)
+    style_parts = []
+    style_parts << "w#{width}" if width
+    style_parts << "h#{height}" if height
+    style = style_parts.join
+    # Build image markdown
+    img = "![#{alt}](#{src})"
+    # Prepend style comment if any dimension given
+    style.empty? ? img : "<!-- style:#{style} -->#{img}"
   end
 
   # Render an inline image using the same logic as block-level image

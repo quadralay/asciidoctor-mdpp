@@ -10,4 +10,5 @@ You will perform incremental tasks to add functionality to the Markdown++ conver
 
   - The file `spec/converter_spec.rb` needs to be updated anytime a new fixture sample is added.
 
+  - Most tasks will begin with a modification of an "expected" and/or sample  fixture. You will analyze the changes to the fixtures and then reverse engineer what modifications to the custom converter are necessary to achieve the expected fixture.
   

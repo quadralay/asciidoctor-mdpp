@@ -3,6 +3,6 @@ Sample Document – Images
 
 This document tests images.
 
-![Tux image](https://upload.wikimedia.org/wikipedia/commons/a/a0/Tux.svg){width=250 height=350}
+<!-- style:w250h350 -->![Tux image](https://upload.wikimedia.org/wikipedia/commons/a/a0/Tux.svg)
 
-Here is an inline image: ![Logo](http://example.com/logo.png){width=100 height=50}.
+Here is an inline image: <!-- style:w100h50 -->![Logo](http://example.com/logo.png).
