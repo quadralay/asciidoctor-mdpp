@@ -1,14 +1,11 @@
 
-This project maintains the AsciiDoctor custom converter for converting AsciiDoc files into Markdown++ files. The converter is in the file: `lib/asciidoctor/converter/mdpp.rb`.
+This project provides the Asciidoctor→Markdown++ converter in `lib/asciidoctor/converter/mdpp.rb`.
 
-The Markdown++ file format is an extension of CommonMark Markdown. It extends the language use simple comments, such as: `<!-- style:Foo; #alias -->`. For filenames, Markdown++ uses the filename extension `*.md`.
+Development follows a test-driven workflow:
+  - Add or update an AsciiDoc sample under `spec/fixtures/samples` and its expected Markdown++ output under `spec/fixtures/expected`.
+  - Update `spec/converter_spec.rb` to include the new fixture(s).
+  - Run `rspec` and ensure all tests pass.
+  - Commit both the converter code changes and fixture updates together.
 
-You will perform incremental tasks to add functionality to the Markdown++ converter.
-  - When code is modified you will be responsible for updating testing fixtures located at: `spec/fixtures`. There are two folders: `samples` (contains test AsciiDoc files) and `expected` (contains golden converted Markdown++ files).
-
-  - When `lib/asciidoctor/converter/mdpp.rb` is modified, you will test it by running `rspec`. If all tests are passed, then you will commit all the changes, including changes to fixtures.
-
-  - The file `spec/converter_spec.rb` needs to be updated anytime a new fixture sample is added.
-
-  - Most tasks will begin with a modification of an "expected" and/or sample  fixture. You will analyze the changes to the fixtures and then reverse engineer what modifications to the custom converter are necessary to achieve the expected fixture.
-  
+For detailed development guidelines, see `docs/development-guide.md`.
+For Markdown++ language specifications, see `docs/mdpp-specification/`.
