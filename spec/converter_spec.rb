@@ -45,4 +45,14 @@ RSpec.describe MarkdownPPConverter do
     expect(convert_sample('nested_blocks.adoc'))
       .to eq File.read(FIXTURES.join('expected', 'nested_blocks.md'))
   end
+  
+  it 'renders simple tables' do
+    expect(convert_sample('tables.adoc'))
+      .to eq File.read(FIXTURES.join('expected', 'tables.md'))
+  end
+  
+  it 'renders multiline tables' do
+    expect(convert_sample('multiline-tables.adoc'))
+      .to eq File.read(FIXTURES.join('expected', 'multiline-tables.md'))
+  end
 end

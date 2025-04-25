@@ -32,13 +32,26 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
 
   # Render the document: title and top-level blocks (preamble, sections, etc.)
   def convert_document(doc)
+    # Prepare document title or fallback to first section title
     parts = []
-    # Render document title as a setext header if a title is defined
+    # Copy blocks to avoid mutating original
+    blocks = doc.blocks.dup
     if doc.header && doc.header.title && !doc.header.title.empty?
+      # Use document title
       parts << convert(doc.header, 'header')
+      rest_blocks = blocks
+    elsif blocks.first && blocks.first.node_name == 'section'
+      # Promote first section title as document title
+      first_sec = blocks.shift
+      title = first_sec.title
+      parts << "#{title}\n#{'=' * title.length}"
+      # Render child blocks of that first section, then any remaining top-level blocks
+      rest_blocks = first_sec.blocks + blocks
+    else
+      rest_blocks = blocks
     end
-    # Render each top-level block (includes preamble and sections)
-    doc.blocks.each do |blk|
+    # Render each remaining block
+    rest_blocks.each do |blk|
       parts << convert(blk)
     end
     parts.compact.join("\n\n")
@@ -236,5 +249,115 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
       end
     end
     parts.join("\n\n")
+  end
+  
+  # Render a table as a Markdown++ table, handling both simple and multiline cases
+  def convert_table(node)
+    # Determine Markdown++ style tag
+    style = node.attr('role')
+    # Fallback: simple table conversion via AST for tables with more than 2 columns
+    ast_rows = node.rows
+    if (ast_rows.respond_to?(:head) && ast_rows.respond_to?(:body) ? (ast_rows.head.first || []).size > 2 : (node.attr('cols') || '').split(',').size > 2)
+      # AST-based simple table
+      # Retrieve header cells and body rows
+      header_cells = ast_rows.respond_to?(:head) ? (ast_rows.head.first || []) : []
+      body_ast = ast_rows.respond_to?(:body) ? ast_rows.body : (begin arr = []; node.rows.each { |r| arr << r.cells }; arr.drop(1) end)
+      headers = header_cells.map(&:text)
+      base_widths = headers.map { |h| h.length + 2 }
+      header_line = "| " + headers.join(' | ') + " |"
+      align_line = '|' + base_widths.map { |w| '-' * w }.join('|') + '|' 
+      body_lines = body_ast.map { |cells| "| " + cells.map(&:text).join(' | ') + " |" }
+      comment = style ? "<!-- style:#{style} -->" : ''
+      return [comment, header_line, align_line, *body_lines].reject(&:empty?).join("\n")
+    end
+    # Locate raw source file and read lines
+    src_file = node.document.attr('docfile')
+    src_lines = File.readlines(src_file)
+    # Identify table boundaries (fenced with |===)
+    start_idx = src_lines.index { |l| l.strip == '|===' }
+    end_rel = src_lines[(start_idx + 1)..-1].index { |l| l.strip == '|===' }
+    end_idx = start_idx + 1 + (end_rel || 0)
+    raw = src_lines[(start_idx + 1)...end_idx]
+    # Parse header row
+    hdr_line = raw.find { |l| l.strip.start_with?('|') }
+    hdr_cols = hdr_line.strip.sub(/^\|/, '').split('|').map(&:strip)
+    # Parse body rows: each '| ' marks a new row; details follow until next '|' or end
+    rows = []
+    body = raw.drop_while { |l| l != hdr_line }[1..] || []
+    i = 0
+    while i < body.size
+      line = body[i]
+      if line.strip.start_with?('|')
+        # New row header
+        header_text = line.strip.sub(/^\|/, '').chomp('+').strip
+        # Collect detail lines until next row or table end
+        details = []
+        i += 1
+        while i < body.size && !body[i].strip.start_with?('|')
+          txt = body[i].rstrip
+          details << txt unless txt.strip.empty?
+          i += 1
+        end
+        rows << { header: header_text, details: details }
+      else
+        i += 1
+      end
+    end
+    # Post-process details for code and admonition rows
+    rows.each do |row|
+      details = row[:details]
+      # Code block detection
+      if details.first =~ /^\[source,.*\]$/
+        # Extract lines between '----' fences
+        start_idx = details.index('----')
+        if start_idx
+          end_idx = details[(start_idx + 1)..].index('----')
+          code_lines = if end_idx
+                         details[(start_idx + 1)...(start_idx + 1 + end_idx)]
+                       else
+                         details[(start_idx + 1)..]
+                       end
+        else
+          code_lines = details.drop(1)
+        end
+        row[:details] = ['```'] + code_lines + ['```']
+      elsif details.first == '===='
+        # Admonition block detection
+        detail = details[1] || ''
+        cap = detail.split(':', 2).first
+        style_name = cap.downcase.capitalize
+        row[:details] = ["<!-- style:Admonition#{style_name} -->", "> #{detail}"]
+      end
+    end
+    # Compute column widths: column1 based on headers and row headers; column2 based on header and details
+    col1_max = ([hdr_cols[0].length] + rows.map { |r| r[:header].length }).max
+    col2_max = ([hdr_cols[1].length] + rows.flat_map { |r| r[:details].map(&:length) }).max
+    widths = [col1_max + 2, col2_max + 2]
+    # Build style comment: add 'multiline' if any detail contains more than one line
+    tags = []
+    tags << "style:#{style}" if style
+    tags << 'multiline' if rows.any? { |r| r[:details].size > 1 }
+    comment = tags.empty? ? '' : "<!-- #{tags.join('; ')} -->"
+    # Build header and alignment rows
+    header_md = "| " + hdr_cols.each_with_index.map { |h, j| h.ljust(widths[j] - 2) }.join(' | ') + " |"
+    align_md = '|' + widths.map { |w| '-' * w }.join('|') + '|' 
+    # Assemble table lines
+    md = []
+    md << comment
+    md << header_md
+    md << align_md
+    rows.each_with_index do |row, idx|
+      # First line: header and first detail (or blank)
+      md << '|' + ' ' + row[:header].ljust(widths[0] - 2) + ' | ' + (row[:details][0] || '').ljust(widths[1] - 2) + ' |'
+      # Additional detail lines
+      row[:details][1..].to_a.each do |det|
+        md << '|' + ' ' * widths[0] + '|' + ' ' + det.ljust(widths[1] - 2) + ' |'
+      end
+      # Separator blank row between logical row groups
+      unless idx == rows.size - 1
+        md << '|' + widths.map { |w| ' ' * w }.join('|') + '|' 
+      end
+    end
+    md.join("\n")
   end
 end
