@@ -1,0 +1,15 @@
+== Sample Document – Tables
+
+This document tests tables.
+
+[cols="1,1,1",role="employee-table"]
+.Employee List
+|===
+| Name    | Age | Position
+
+| Alice   | 30  | Developer
+| Bob     | 25  | Designer
+| Charlie | 35  | Manager
+|===
+
+End of document.
