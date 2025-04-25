@@ -1,0 +1,11 @@
+== Sample Document – Includes
+
+This document tests includes.
+
+include::intro.adoc[]
+
+Some text after.
+
+include::nested/path/chunk.adoc[]
+
+End of document.

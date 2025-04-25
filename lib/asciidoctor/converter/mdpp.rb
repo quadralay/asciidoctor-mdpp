@@ -1,5 +1,20 @@
 require 'asciidoctor'
 require 'asciidoctor/converter'
+require 'asciidoctor/extensions'
+
+# Extension: intercept AsciiDoc include directives and convert to Markdown++ include tags
+Asciidoctor::Extensions.register do
+  include_processor do
+    # Handle all include targets
+    process do |doc, reader, target, attributes|
+      # Convert file extension to .md
+      md_path = target.sub(/\.[^.]+$/, '.md')
+      include_tag = "<!--include:#{md_path}-->"
+      # Push include tag into reader as literal content
+      reader.push_include include_tag + "\n", nil, target, reader.lineno, {}
+    end
+  end
+end
 
 class MarkdownPPConverter < Asciidoctor::Converter::Base
   register_for 'mdpp', filetype: 'md', outfilesuffix: '.md'
@@ -82,6 +97,10 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
   end
   # Render a paragraph. Handle inline image macros specially, otherwise process inline macros.
   def convert_paragraph(par)
+    # If this paragraph is a Markdown++ include tag, emit it raw
+    if par.lines.size == 1 && par.lines.first.strip =~ /<!--\s*include:[^>]+-->/
+      return par.lines.first.strip
+    end
     # If the paragraph contains an inline image macro, convert it manually
     if par.lines.any? { |line| line.include? 'image:' } && par.lines.any? { |line| line.match(/image:[^\[]+\[[^\]]+\]/) }
       text = par.lines.join("\n")
@@ -355,7 +374,11 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     comment = tags.empty? ? '' : "<!-- #{tags.join('; ')} -->"
     # Build header and alignment rows
     header_md = "| " + hdr_cols.each_with_index.map { |h, j| h.ljust(widths[j] - 2) }.join(' | ') + " |"
-    align_md = '|' + widths.map { |w| '-' * w }.join('|') + '|' 
+    # Alignment line: adjust second column width for multiline tables
+    align_parts = widths.map.with_index do |w, idx|
+      '-' * (idx.zero? ? w : w + 1)
+    end
+    align_md = '|' + align_parts.join('|') + '|'
     # Assemble table lines
     md = []
     md << comment
@@ -370,7 +393,11 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
       end
       # Separator blank row between logical row groups
       unless idx == rows.size - 1
-        md << '|' + widths.map { |w| ' ' * w }.join('|') + '|' 
+        # Blank separator row: adjust second column width as alignment line
+        blank_parts = widths.map.with_index do |w, idx|
+          ' ' * (idx.zero? ? w : w + 1)
+        end
+        md << '|' + blank_parts.join('|') + '|'
       end
     end
     md.join("\n")

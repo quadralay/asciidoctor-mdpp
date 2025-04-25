@@ -5,3 +5,8 @@ For project-specific instructions, see the following files and directories:
 - `docs/mdpp-specification/`: Markdown++ language extension specifications (e.g., multiline tables).
 
 Tracks these files to ensure any changes to workflows or specs are captured and committed.
+
+Additional session progress tracking:
+- When a user prompt begins with “Task:” (case-insensitive), or uses “task” to signal upcoming work, the CLI should:
+  1. Invoke `SessionTracker.log_task(prompt_text)` (from `.codex/session_tracker.rb`) to append the full prompt to `.codex/SESSION_TASKS.md`.
+  2. On startup, load the last entry via `SessionTracker.last_task` so the agent can re-state the most recent task.

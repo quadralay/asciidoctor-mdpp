@@ -55,4 +55,9 @@ RSpec.describe MarkdownPPConverter do
     expect(convert_sample('multiline-tables.adoc'))
       .to eq File.read(FIXTURES.join('expected', 'multiline-tables.md'))
   end
+  
+  it 'renders file includes' do
+    expect(convert_sample('includes.adoc'))
+      .to eq File.read(FIXTURES.join('expected', 'includes.md'))
+  end
 end

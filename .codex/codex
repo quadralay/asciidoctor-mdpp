@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+// Wrapper for Codex CLI that logs “Task:” prompts into .codex/SESSION_TASKS.md
+import { spawnSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+
+// Real Codex binary (can be overridden via CODEX_BIN env)
+const realCodex = process.env.CODEX_BIN || '/root/.nvm/versions/node/v22.6.0/bin/codex';
+
+// Build prompt string from argv
+const args = process.argv.slice(2);
+const promptText = args.join(' ');
+
+// Prepare session tracking file
+const codexDir = path.resolve(process.cwd(), '.codex');
+const tasksFile = path.join(codexDir, 'SESSION_TASKS.md');
+
+// If this invocation looks like a task declaration, log it
+if (/^\s*task:/i.test(promptText)) {
+  try { fs.mkdirSync(codexDir, { recursive: true }); } catch {}
+  const timestamp = new Date().toISOString();
+  fs.appendFileSync(tasksFile, `${timestamp}  ${promptText}\n`);
+}
+
+// Forward all args to the real Codex CLI
+const result = spawnSync(realCodex, args, { stdio: 'inherit' });
+process.exit(result.status);
