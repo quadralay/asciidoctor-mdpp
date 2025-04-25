@@ -12,7 +12,7 @@ For Markdown++ language specifications, see `docs/mdpp-specification/`.
 
 ## Session Task Logging
 
-When a prompt begins with “Task:” (case-insensitive), or otherwise uses “task” to signal upcoming work, the CLI will record that full description into `.codex/SESSION_TASKS.md` with a timestamp. On restart, inspecting this file or calling `SessionTracker.last_task` (from `.codex/session_tracker.rb`) lets you resume from the last assigned task.
+When a prompt begins with “Task:” (case-insensitive), or otherwise uses “task” to signal upcoming work, the CLI will record that full description into `.codex/SESSION_TASKS.md` with a timestamp. On restart, inspecting this file or calling `lastTask()` (from `.codex/session_tracker.js`) lets you resume from the last assigned task.
 
 To activate this wrapper:
 1. Place the wrapper script in `.codex/codex` (included here).

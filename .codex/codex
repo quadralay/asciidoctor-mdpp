@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Wrapper for Codex CLI that logs “Task:” prompts into .codex/SESSION_TASKS.md
+// Uses session_tracker.js for logging and retrieval
 import { spawnSync } from 'child_process';
-import fs from 'fs';
-import path from 'path';
+import { logTask, lastTask } from './session_tracker.js';
 
 // Real Codex binary (can be overridden via CODEX_BIN env)
 const realCodex = process.env.CODEX_BIN || '/root/.nvm/versions/node/v22.6.0/bin/codex';
@@ -11,15 +11,15 @@ const realCodex = process.env.CODEX_BIN || '/root/.nvm/versions/node/v22.6.0/bin
 const args = process.argv.slice(2);
 const promptText = args.join(' ');
 
-// Prepare session tracking file
-const codexDir = path.resolve(process.cwd(), '.codex');
-const tasksFile = path.join(codexDir, 'SESSION_TASKS.md');
+// On startup, announce the last logged task (if any)
+const last = lastTask();
+if (last) {
+  console.log(`⚡ Resuming last task:\n  ${last}\n`);
+}
 
 // If this invocation looks like a task declaration, log it
 if (/^\s*task:/i.test(promptText)) {
-  try { fs.mkdirSync(codexDir, { recursive: true }); } catch {}
-  const timestamp = new Date().toISOString();
-  fs.appendFileSync(tasksFile, `${timestamp}  ${promptText}\n`);
+  logTask(promptText);
 }
 
 // Forward all args to the real Codex CLI
