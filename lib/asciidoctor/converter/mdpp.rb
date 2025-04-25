@@ -258,15 +258,30 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     # Fallback: simple table conversion via AST for tables with more than 2 columns
     ast_rows = node.rows
     if (ast_rows.respond_to?(:head) && ast_rows.respond_to?(:body) ? (ast_rows.head.first || []).size > 2 : (node.attr('cols') || '').split(',').size > 2)
-      # AST-based simple table
-      # Retrieve header cells and body rows
+      # AST-based simple table: pad columns to equal width
       header_cells = ast_rows.respond_to?(:head) ? (ast_rows.head.first || []) : []
       body_ast = ast_rows.respond_to?(:body) ? ast_rows.body : (begin arr = []; node.rows.each { |r| arr << r.cells }; arr.drop(1) end)
-      headers = header_cells.map(&:text)
-      base_widths = headers.map { |h| h.length + 2 }
-      header_line = "| " + headers.join(' | ') + " |"
-      align_line = '|' + base_widths.map { |w| '-' * w }.join('|') + '|' 
-      body_lines = body_ast.map { |cells| "| " + cells.map(&:text).join(' | ') + " |" }
+      # Extract texts
+      header_texts = header_cells.map(&:text)
+      body_texts = body_ast.map { |cells| cells.map(&:text) }
+      # Compute max length per column
+      max_lens = header_texts.map(&:length)
+      body_texts.each do |row|
+        row.each_with_index { |text, idx| max_lens[idx] = text.length if text.length > max_lens[idx] }
+      end
+      # Column widths with padding
+      widths = max_lens.map { |l| l + 2 }
+      # Build header line
+      hdr_cells = header_texts.each_with_index.map { |h, i| h.ljust(widths[i] - 2) }
+      header_line = "| " + hdr_cells.join(' | ') + " |"
+      # Build alignment line
+      align_line = '|' + widths.map { |w| '-' * w }.join('|') + '|' 
+      # Build body lines
+      body_lines = body_texts.map do |row|
+        cells = row.each_with_index.map { |text, i| text.ljust(widths[i] - 2) }
+        "| " + cells.join(' | ') + " |"
+      end
+      # Style comment
       comment = style ? "<!-- style:#{style} -->" : ''
       return [comment, header_line, align_line, *body_lines].reject(&:empty?).join("\n")
     end
