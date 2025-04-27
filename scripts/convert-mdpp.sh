@@ -22,5 +22,7 @@ while IFS= read -r -d '' src; do
   dst="$OUT_DIR/${rel%.*}.mdpp"
   mkdir -p "$(dirname "$dst")"
 
+  # show progress
+  echo "Converting: $src -> $dst"
   asciidoctor -r "$CONVERTER" -b mdpp -o "$dst" "$src"
 done
