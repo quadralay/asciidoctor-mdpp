@@ -56,6 +56,11 @@ RSpec.describe MarkdownPPConverter do
       .to eq File.read(FIXTURES.join('expected', 'multiline-tables.md'))
   end
   
+  it 'renders grid row tables' do
+    expect(convert_sample('grid_rows.adoc'))
+      .to eq File.read(FIXTURES.join('expected', 'grid_rows.md'))
+  end
+  
   it 'renders file includes' do
     expect(convert_sample('includes.adoc'))
       .to eq File.read(FIXTURES.join('expected', 'includes.md'))

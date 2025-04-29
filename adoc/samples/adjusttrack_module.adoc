@@ -1,0 +1,380 @@
+
+== AdjustTrack [[adjust_track]]
+
+
+
+=== Overview
+
+There will be times when tracks can drift due to lack of detail or introduction of small obstructions.  When this occurs, manual refinements can be made by using the AdjustTrack tool.
+
+AdjustTrack is primarily used for eradicating drift by adjusting reference points to generate keyframable data to compensate.  It is generally not practical to use it to remove jitter.
+
+To achieve an adjusted track you would ideally line up the surface area where you want to place your insert or lock down your roto.
+
+In situations where you don't require an insertion you could place the corners of the surface area in distinctive locations.
+
+
+The Transform AdjustTrack is designed to be an easier user experience from the Classic AdjustTrack (see below) by removing the need to use the surface as your alignment tool.
+
+In Transform AdjustTrack you can adjust based on specific transforms with as many reference points as you require over time.
+
+image:UserGuide/en_US/images/adjusttrack_transform_parameters.jpg[]
+
+=== Setting up reference points
+
+You can set reference points either as a template for the kind of adjustment you want, or add them yourself as needed.
+
+NOTE: We recommend turning off the splines view (i.e 'Show Layer Outlines') during adjusting the track so you can see the adjustment of points clearly.
+
+image:UserGuide/en_US/images/adjusttrack_transform_reference_points.jpg[pdfwidth="60%", width="60%"]
+
+==== Transform Type  [[transform_types]]
+
+The transform type is used to set up the method of Adjustment you want to use for the shot.
+
+Each checkbox sets a different number of points when you click “Set Points”
+
+* Translation: Sets one point for x/y translation
+* Scale/Rotation: Sets two points to rotate or scale between points. Moving a point toward or away from the other point scales, moving a point at an angle the other causes rotation.
+* Shear: Sets 3 points for allowing skew/shear adjustment
+* Perspective: Sets 4 points for full 4-point corner-pin style perspective adjustment.
+
+Note that the Transform selection works in a similar way to the Motion type in the Track module. When you select a motion type further down the list, it will automatically select the ones above it in order for the tracking keyframes to be adjusted predictably.
+
+You can opt to turn off the default-selected transform types later if you need to do a specific adjustment.
+
+After you have chosen the type, click 'Set points' to create the points. You can then adjust the reference points (see below).
+
+
+image:UserGuide/en_US/images/adjusttrack_transform_perspective_template.jpg[pdfwidth="80%", width="40%"]
+
+=== Reference Points
+
+1. You can add more points to your adjustment as required. Each point contributes to the adjustment of the plane based on the position of the other points.
+2. You can select between the points using the cursor or cycle using the select <> buttons.
+3. Position your points on easily identifiable areas
+4. Once you are happy with the position of the points, click “Set Reference Frame” to define a frame to look to when adjusting forwards or backwards from that point.
+
+
+
+image:UserGuide/en_US/images/adjusttrack_transform_new_point.jpg[pdfwidth="80%", width="40%"]
+
+=== Adjusting points
+
+Once you are happy with the points positions and have set a reference frame, you can start moving back and forth on the timeline adjusting the points for drift.
+
+Right-clicking a point selects all points or you can shift-click individual points and can move them as one.
+
+Take note of the <<transform_types, Transform type>> when moving points, as the Transform type affects how points adjust the track.
+
+By default, for your initial set of points, each point adjustment sets a key frame for every other point in the shot to avoid unwanted distortions.
+
+image:UserGuide/en_US/images/adjusttrack_transform_keyframe.jpg[pdfwidth="80%", width="40%"]
+
+You can see the original reference frame for the selected point in the zoom window in the upper left of the viewer and the current frame in the window below that.
+
+image:UserGuide/en_US/images/adjusttrack_transform_zoom_windows.jpg[pdfwidth="80%", width="40%"]
+
+IMPORTANT: An adjustment point only affects the track within the bounds of its own keyframes. Outside that keyframe range it stops adjusting the track. See <<adjusttrack_point_lifespan, Adjustment Point Lifespan>>
+
+You can then keep adjusting the points over the timeline until all drift is corrected.
+
+==== Point Arrows and Keyframe Direction
+
+You'll notice as you make keyframes for your points that they have different arrow symbols in the viewer. These help you determine what points have been keyframed and if there are other keyframes in the timeline for that point.
+
+If there are point keyframes to the left, right or both sides of the current frame, arrows will appear to indicate the direction they are in.
+
+Here's what these symbols mean:
+
+[cols='^1,2', frame="none", grid="rows", valign="middle"]
+|====
+| image:UserGuide/en_US/images/adjusttrack_transform_ref_point.jpg[]|*Reference Point:* An initially placed reference frame point with no adjustment keyframes.
+| image:UserGuide/en_US/images/adjusttrack_transform_ref_with_keyframe.jpg[]|*Reference Point with Keyframes:* A reference frame that has adjustment keyframes. Arrows will point in the direction keyframing has been done on the timeline. If there are keyframes on either side of the reference frame, there will be arrows on both sides.
+| image:UserGuide/en_US/images/adjusttrack_transform_keyframed_contributing_point.jpg[]|*Keyframed Point:* A point that has been keyframed. The bracket arrow indicates the keyframing. Closed triangle arrows point in the direction of other keyframes that exist on the timeline for this point.
+| image:UserGuide/en_US/images/adjusttrack_transform_noncontributing_point.jpg[]|*Non-Keyframed Point:* A point that has not been keyframed on this frame. The non-bracketed triangle arrows will point to other keyframes for this point on the timeline.
+|====
+
+
+=== Adding New Points for Further Adjustment
+
+It's quite common that one of your AdjustTrack points is going to get obscured, go out of frame or no longer have a usable visual reference in the scene.
+This is when you may want to add new points to the adjustment.
+
+You can add as many points as you like to an adjustment over time. Each keyframed point contributes to the adjustment on that frame.
+
+In order to do this effectively however, you need to understand AdjustTrack Transform keyframe ranges.
+
+==== Adjustment Point Lifespan [[adjusttrack_point_lifespan]]
+
+Each point in AdjustTrack Transform has what is known as an _effective keyframe range_. This is the lifespan of the point currently in use.
+
+A point can be moved to contribute to the current adjustment, but that point's adjustments _are only valid between those keyframes_.
+
+Any additional keyframes you add to a point further in time forward or backward from the reference point will contribute to the overall adjustment.
+
+Points do not contribute to an adjustment outside of their keyframe range.
+
+What this means is you can add _new_ points further along the timeline that can create adjustments that won't be affected by the other points.
+
+.AdjustTrack Keyframe Range
+[example]
+====
+The point below has a reference point at frame 571 and an adjustment keyframe at 610. This point only affects the track adjustment between these keyframes:
+image:UserGuide/en_US/images/adjusttrack_transform_example_keyframerange.jpg[pdfwidth="80%", width="60%"]
+
+Also note the extra bracket on the arrow on the adjustment point. This tells us we're currently in the contributing keyframe range of the point.
+====
+
+==== Creating a New Point as a Replacement Reference
+
+Sometimes a point can no longer contribute to the adjustment.
+
+When you want to add a new point to continue the adjustment, you can create one at the keyframed boundaries of the old point:
+
+. Go to a frame in the timeline that is on or outside the keyframe range of the point you are no longer using.
+. Click "Add New Point" to toggle on the new point tool
+image:UserGuide/en_US/images/adjusttrack_transform_addnew.jpg[pdfwidth="40%", width="40%"]
+. Place the new point at a clear feature location. It will then become a new starting reference point.
+. Click "Add New Point" again to toggle it off
+. You will will then want to keyframe points separately to avoid keyframing the old point. See "Keyframing with a New Point" below.
+
+
+==== Keyframing with a New Point
+
+By default, all AdjustTrack points are keyframed at the same time with the "Keyframe All Points" option:
+
+image:UserGuide/en_US/images/adjusttrack_transform_keyframeall.jpg[pdfwidth="40%", width="40%"]
+
+
+When adjusting new points in a different keyframe range you will want to turn off "Keyframe All Points" or use the `Alt+CMD/Ctrl` shortcut when altering points.
+
+image:UserGuide/en_US/images/adjusttrack_transform_keyframeall_off.jpg[pdfwidth="40%", width="40%"]
+
+This is important, because continuing to keyframe all points will make the old points still affect the adjustment at that frame in the timeline.
+
+After creating your new point:
+
+. Move to a new position in the timeline where there is drift
+. Turn off "Keyframe All Points" (Or hold down `Alt+CMD/Ctrl`)
+. Adjust the new point
+. Repeat for any points _still contributing to the adjustment_
+. Do NOT keyframe the old point. Keyframing an obscured or out of frame point will re-add its position to the adjustment
+
+We recommend locking points when you are no longer using it in the current adjustment range. See <<lock_adjusttrack, Locking Points>> below.
+
+IMPORTANT: Keyframing Adjustment points will cause them contribute the adjustment in that keyframe range. Keep this in mind when going back to older points.
+
+.Adding and adjusting new points
+[example]
+====
+In this example, the point in the bottom corner is about to go off screen. It's last adjustment keyframe is on frame 276:
+image:UserGuide/en_US/images/adjusttrack_transform_example_newpoint_adjustment01.jpg[pdfwidth="80%", width="80%"]
+
+We can create a new reference point at this frame to keep adjusting when the old point goes offscreen. Note that this is on the same frame (276):
+image:UserGuide/en_US/images/adjusttrack_transform_example_newpoint_adjustment02.jpg[pdfwidth="80%", width="80%"]
+
+Further along the timeline, the old point is now out of the screen, but we can keyframe the new reference point, making sure we've turned off "Keyframe All Points":
+image:UserGuide/en_US/images/adjusttrack_transform_example_newpoint_adjustment03.jpg[pdfwidth="80%", width="80%"]
+
+We then adjust any other point we still want to contribute to the adjustment, adding a keyframe for those points. Note the specific keyframing arrow that tells us it's contributing.
+image:UserGuide/en_US/images/adjusttrack_transform_example_newpoint_adjustment04.jpg[pdfwidth="80%", width="80%"]
+
+Selecting the old point that is outside the view, we can see it doesn't have a keyframe on this frame, and so it is not in the adjustment range:
+image:UserGuide/en_US/images/adjusttrack_transform_example_newpoint_adjustment05.jpg[pdfwidth="80%", width="80%"]
+
+====
+
+==== Locking Points [[lock_adjusttrack]]
+
+To avoid keyframing reference points by accident, you can lock a point by using the lock icon in the interface:
+
+image:UserGuide/en_US/images/adjusttrack_transform_reference_points.jpg[pdfwidth="60%", width="60%"]
+
+When a keyframe is locked, it turns grey in the viewer. It can still be selected, but you can no longer keyframe or move the point until you unlock it again.
+
+image:UserGuide/en_US/images/adjusttrack_transform_locked_point.jpg[pdfwidth="60%", width="60%"]
+
+To unlock a point, just select it and click the lock icon again.
+
+
+==== Surface View
+
+image:UserGuide/en_US/images/adjusttrack_transform_surface_view.jpg[pdfwidth="40%", width="40%"]
+
+While you are adjusting, you can click one of the “Surface View” corners to see how the surface itself is adjusting to your changes. This is helpful if you are ultimately planning on using the surface as your export area and want to make sure it is still lining up.
+
+==== Nudge
+
+image:UserGuide/en_US/images/adjusttrack_transform_nudge.jpg[pdfwidth="40%", width="40%"]
+
+Nudging is used to adjust the track by pixel increments. This helps when adjustments are too subtle to be done by mouse movement.
+
+Each arrow nudges in the indicated direction. You can either click and hold the button or use the shortcut keys to nudge.
+
+The 'Auto' button in the middle of the direction grid tries to guess where the point needs to be.
+It can be useful to start with 'Auto' to attempt to place the reference point first, then adjust manually.
+
+==== Auto Nudge
+
+image:UserGuide/en_US/images/adjusttrack_transform_autonudge.jpg[pdfwidth="40%", width="40%"]
+
+Auto Nudge takes the 'Auto' action above and lets you use it space adjustments over the whole shot.
+
+If you set 'Auto Step' and define a frame step you can then 'Track' the Auto Nudge using the tracking buttons in the timeline. Auto Nudge will then nudge the selected reference points at the frame step interval set.
+
+The Search fields define how far Auto and Auto Nudge look for the area the point needs to adjust to.
+
+NOTE: Auto Nudge is useful for quickly going through a shot to help pace adjustments. It is not recommended to be used as a solution for finishing adjustments.
+
+=== Exporting
+
+You can export adjusted tracks as normal via the file menu or via the Track module just like any regular track.
+
+== AdjustTrack Classic
+
+We've kept the old-style of AdjustTrack for those who prefer to it, or if you are working with legacy projects.
+
+This version of AdjustTrack is primarily used for eradicating drift by utilizing the four-corner surface area to generate keyframable data to compensate.  It is generally not practical to use it to remove jitter.
+
+
+=== Starting the Track Adjustment
+
+When you have the Surface where you want it to stay locked and are ready to refine the track, flip over into the AdjustTrack module by hitting the AdjustTrack tab.
+
+Then switch to the Classic tab.
+
+image:UserGuide/en_US/images/AdjustTrack_001.jpg[]
+
+
+=== Reference Points
+
+Once you select the Classic AdjustTrack tab, a key frame with four reference points is created.
+
+NOTE: You should be on your desired primary frame before selecting the AdjustTrack tab. The reference points can then be positioned on distinctive features, such that any drift in the track can be easily seen and corrected.
+
+
+
+image:UserGuide/en_US/images/IPAD_Screen_008.jpg[]
+
+
+As you play though the sequence you will be able to manually adjust the position of each point as drift occurs.
+
+If your track is spot on, these reference points should line up properly throughout the shot. If you see a Reference Point drifting, that will indicate the track is drifting. Find the frame where the drift is worst and move the Reference Point back to the position it had in the Primary Frame and the track will automatically be adjusted based on your correction.
+
+
+
+=== Reference Point Quality
+
+When you perform an adjust track and you begin to move a newly created reference point, you will notice the dashed lines which connect all of the reference points. These lines change in color to represent the quality of positioning of any given reference point. For best results keep reference points away from one another.
+
+
+
+image:UserGuide/en_US/images/SelectionGuide_001.jpg[]
+
+When adjusting the track try to always get at least yellow but shoot for green for a more solid adjust track.
+
+The red lines indicate that this reference point position is a poor choice.
+
+
+
+image:UserGuide/en_US/images/IPAD_Screen_009.jpg[]
+
+
+The green lines indicate that this reference point position is a good choice.
+
+
+
+image:UserGuide/en_US/images/IPAD_Screen_010.jpg[]
+
+
+=== AdjustTrack with More than Four Reference Points
+
+Often there are times where your reference points are either obscured or exit frame. In AdjustTrack you have the ability to create multiple reference points per surface corner that can be positioned in alternate locations to handle these situations. Simply click the New Ref button to create a new reference point for the selected corner.
+
+You cannot keyframe the Surface — only the Reference Points. The original track and any refinements you make in AdjustTrack cause the Surface to move however.
+
+
+
+=== Working Backwards
+
+Every so often a shot will come along that is easier to track backwards than forwards. This is fairly simple when running the tracker backwards, but introduces some rather obtuse concepts when keyframing is involved. This is why there are two "New Ref" buttons provided. If you are working backwards and wish to set a new reference point, you will probably want to use the "&lt;- New Ref" button instead of the forward-thinking "New Ref -&gt;" button.
+
+image:UserGuide/en_US/images/AdjustTrackRef_001.jpg[]
+
+Because keyframing "thinks" forward, hitting "&lt;-New Ref" will not create new Primary Reference points on the current frame, but will go backwards in time, looking for any existing keyframes and set new Primary Reference points on the frame directly after. For example, if you decide to create a new backwards reference point at frame 20, a new primary reference will be created at frame 21.
+
+Some people may be more comfortable doing this manually by moving the playhead themselves and using the traditional "New Ref -&gt;" button. Others who do a lot of tracking and find themselves working backwards often may find the backwards-thinking New Ref button helpful.
+
+
+=== About Primary Reference Points (the red X)
+
+Every Reference Point has one frame in which its initial placement is determined without causing any adjustment to the track. This is called the Primary Reference Point; if you step forward or backward in time you will notice the red X change to a red dot.
+
+image:UserGuide/en_US/images/AdjustTrackRefCorner_001.jpg[pdfwidth="60%", width="60%"]
+
+The red X indicates that this particular frame is the starting point for calculating adjustments. Moving a Primary Reference Point will NOT change the tracking data.
+
+Go ahead and experiment - move the Reference Point when it is a red X (a Primary Reference Point). You will notice the Surface isn't adjusted at all. Step forward a frame and move the same point - this time the surface will move because you are now adjusting the track.
+
+
+=== Changing the Primary Frame for a Reference Point
+
+By default, the frame in which you create a Reference Point is its Primary Reference frame. This Primary Reference can occur on a different frame for each reference point. You can change the Primary Reference frame by selecting a Reference Point, going to the appropriate frame and hitting the "Set Primary" button.
+
+image:UserGuide/en_US/images/AdjustTrackSetPrimary_001.jpg[pdfwidth="60%", width="60%"]
+
+You may set a new Primary Reference Frame for all active points by hitting the Set Primary All button.
+
+
+image:UserGuide/en_US/images/AdjustTrackSetPrimaryALL_001.jpg[pdfwidth="60%", width="60%"]
+
+
+=== Selecting Different Reference Points
+
+One method for selecting different reference points is to hit the "Next" button.
+
+image:UserGuide/en_US/images/AdjustTrackNEXT_001.jpg[pdfwidth="60%", width="60%"]
+
+The next button simply cycles through the active reference points for that frame. More fine-grained control of reference points can be obtained through the Nudge control panel, described below.
+
+
+
+=== Deleting Reference Points
+
+Deleting Reference Points is done by selecting the point you wish to remove and hitting the delete key. If there are multiple Reference points on a particular corner, the preceding Reference Point will be extended through your time line until a new Reference point is encountered.
+
+
+
+=== Nudging Reference Points
+
+The Nudge section allows you to move Reference points in 0.1 pixel increments, much more fine grained than would be possible by dragging the points manually. You can easily select any active Reference Point by selecting one of the corner buttons in the Nudge section.
+
+image:UserGuide/en_US/images/AdjustTrackNUDGE_001.jpg[pdfwidth="60%", width="60%"]
+
+If you hit the Auto button, a tracker will attempt to line up the selected Reference Point based on its position in the Primary Reference frame. The Search Region Size and Maximum Motion parameters can be set in pixels in the Auto Nudge section.
+
+You can quickly select any corner by using the Corner selector buttons in the Nudge control panel. In the image below, the user is selecting the upper right corner in preparation for nudging operations.
+
+
+
+=== View Options
+
+The Classic AdjustTrack tab has a View section for cleaning up your AdjustTrack workspace. Deselecting the Inactive Traces button will cause the display to hide the traces of the inactive Reference Points. This is helpful if you have a corner with numerous Reference Points offsetting it.
+
+Deselecting the Unselected Traces button will hide any Reference Point that is not selected.
+
+Finally, deselecting the Search Area button will hide the Search Region Size (in Yellow) and the Maximum Motion search area (in Pink).
+
+
+=== Tips for AdjustTrack
+
+*Adjust frames at the peak of drift*
+
+When you see a drift, carefully cycle through the timeline and look for where the motion starts to change direction. A frame before this, adjust your drift, then go halfway between your primary frame and the adjusted frame to check for any further drift.  If you keep working by checking halfway between each keyframe you set, you will reduce the amount of keyframes required.
+
+
+
+*A huge amount of keyframes is not a good sign*
+
+If you end up with adjustment keyframes on a large amount of frames it may be better retry the track.  AdjustTrack is aimed to help reduce small anomalies and fix drift when a tracked corner has become obscured.  If you are fixing every second keyframe it means you have more than a simple drift.

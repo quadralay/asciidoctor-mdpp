@@ -1,0 +1,5 @@
+[cols='^1,2',frame="none",grid="rows",valign="middle"]
+|====
+| A | B
+| C | D
+|====

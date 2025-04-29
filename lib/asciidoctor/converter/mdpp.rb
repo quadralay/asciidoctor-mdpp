@@ -282,11 +282,14 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
       body_ast = ast_rows.respond_to?(:body) ? ast_rows.body : (begin arr = []; node.rows.each { |r| arr << r.cells }; arr.drop(1) end)
       # Extract texts
       header_texts = header_cells.map(&:text)
-      body_texts = body_ast.map { |cells| cells.map(&:text) }
-      # Compute max length per column
+      body_texts   = body_ast.map { |cells| cells.map(&:text) }
+      # Compute max length per column, defaulting missing entries to 0
       max_lens = header_texts.map(&:length)
       body_texts.each do |row|
-        row.each_with_index { |text, idx| max_lens[idx] = text.length if text.length > max_lens[idx] }
+        row.each_with_index do |text, idx|
+          current = max_lens[idx] || 0
+          max_lens[idx] = text.length if text.length > current
+        end
       end
       # Column widths with padding
       widths = max_lens.map { |l| l + 2 }
@@ -304,9 +307,56 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
       comment = style ? "<!-- style:#{style} -->" : ''
       return [comment, header_line, align_line, *body_lines].reject(&:empty?).join("\n")
     end
-    # Locate raw source file and read lines
+    # Locate raw source file and read lines; if file unreadable, fallback to simple AST conversion
     src_file = node.document.attr('docfile')
-    src_lines = File.readlines(src_file)
+    begin
+      src_lines = File.readlines(src_file)
+    rescue
+      # Fallback to simple AST-based table conversion
+      header_cells = ast_rows.respond_to?(:head) ? (ast_rows.head.first || []) : []
+      body_ast = ast_rows.respond_to?(:body) ? ast_rows.body : (begin arr = []; node.rows.each { |r| arr << r.cells }; arr.drop(1) end)
+      header_texts = header_cells.map(&:text)
+      body_texts = body_ast.map { |cells| cells.map(&:text) }
+      max_lens = header_texts.map(&:length)
+      body_texts.each do |row|
+        row.each_with_index { |text, idx| max_lens[idx] = text.length if text.length > max_lens[idx] }
+      end
+      widths = max_lens.map { |l| l + 2 }
+      hdr_cells = header_texts.each_with_index.map { |h, i| h.ljust(widths[i] - 2) }
+      header_line = "| " + hdr_cells.join(' | ') + " |"
+      align_line = '|' + widths.map { |w| '-' * w }.join('|') + '|'
+      body_lines = body_texts.map do |row|
+        cells = row.each_with_index.map { |text, i| text.ljust(widths[i] - 2) }
+        "| " + cells.join(' | ') + " |"
+      end
+      comment = style ? "<!-- style:#{style} -->" : ''
+      return [comment, header_line, align_line, *body_lines].reject(&:empty?).join("\n")
+    end
+    # If table is not fenced with grid markers, fallback to simple AST conversion
+    unless src_lines.any? { |l| l.strip == '|===' }
+      header_cells = ast_rows.respond_to?(:head) ? (ast_rows.head.first || []) : []
+      body_ast = ast_rows.respond_to?(:body) ? ast_rows.body : (begin arr = []; node.rows.each { |r| arr << r.cells }; arr.drop(1) end)
+      header_texts = header_cells.map(&:text)
+      body_texts = body_ast.map { |cells| cells.map(&:text) }
+      # Safe AST-based fallback: compute column widths
+      max_lens = header_texts.map(&:length)
+      body_texts.each do |row|
+        row.each_with_index do |text, idx|
+          current = max_lens[idx] || 0
+          max_lens[idx] = text.length if text.length > current
+        end
+      end
+      widths = max_lens.map { |l| (l || 0) + 2 }
+      hdr_cells = header_texts.each_with_index.map { |h, i| h.ljust(widths[i] - 2) }
+      header_line = "| " + hdr_cells.join(' | ') + " |"
+      align_line = '|' + widths.map { |w| '-' * w }.join('|') + '|'
+      body_lines = body_texts.map do |row|
+        cells = row.each_with_index.map { |text, i| text.ljust(widths[i] - 2) }
+        "| " + cells.join(' | ') + " |"
+      end
+      comment = style ? "<!-- style:#{style} -->" : ''
+      return [comment, header_line, align_line, *body_lines].reject(&:empty?).join("\n")
+    end
     # Identify table boundaries (fenced with |===)
     start_idx = src_lines.index { |l| l.strip == '|===' }
     end_rel = src_lines[(start_idx + 1)..-1].index { |l| l.strip == '|===' }
