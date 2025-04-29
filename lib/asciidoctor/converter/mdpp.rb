@@ -193,12 +193,21 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
   def convert_admonition(node)
     # Build style tag (e.g., AdmonitionNote, AdmonitionTip)
     style = "Admonition#{node.caption}"
-    # Render child blocks and join their content lines
-    content = node.blocks.map { |b| convert(b) }.join("\n")
-    # Quote each line of the content
-    quoted = content.lines.map { |line| "> #{line.chomp}" }.join("\n")
-    # Prepend style comment
-    "<!-- style:#{style} -->\n" + quoted
+    # Gather content lines: use nested blocks if present, else raw lines
+    if node.blocks.any?
+      # convert each child block and accumulate its lines
+      content = node.blocks.map { |b| convert(b) }.join("\n")
+      lines = content.lines.map(&:chomp)
+      suffix = ''
+    else
+      # fallback to raw source lines for short-form admonition
+      lines = node.lines.map(&:chomp)
+      suffix = "\n"
+    end
+    # Quote each line
+    quoted = lines.map { |line| "> #{line}" }.join("\n")
+    # Prepend style comment and content, with optional suffix
+    "<!-- style:#{style} -->\n" + quoted + suffix
   end
 
   # Render an example block (==== delimited) as nested blockquote lines

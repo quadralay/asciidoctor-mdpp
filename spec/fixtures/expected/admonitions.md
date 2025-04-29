@@ -11,3 +11,8 @@ This document tests admonition blocks.
 
 <!-- style:AdmonitionTip -->
 > This is a tip.
+
+Test a more basic admonition.
+
+<!-- style:AdmonitionNote -->
+> We recommend turning off the splines view (i.e 'Show Layer Outlines') during adjusting the track so you can see the adjustment of points clearly.
