@@ -25,4 +25,31 @@ This document summarizes key workflows, conventions, and architectural notes for
 - Use interactive inspect scripts (e.g., throwaway `inspect_*.rb`) to explore Asciidoctor AST nodes, then delete those scripts before committing.
 - Keep commits small and focused: fix root causes, update only relevant files.
 
+## CLI Wrapper and Batch Conversion Script
+- A helper script lives at `scripts/convert-mdpp.sh` to run the MDPP converter recursively over a directory tree.
+  - Usage: `./scripts/convert-mdpp.sh <SRC_DIR> <OUT_DIR>`
+  - It finds all `.adoc`/`.asciidoc` files under `SRC_DIR`, creates matching paths in `OUT_DIR`, and invokes:
+    ```bash
+    asciidoctor -r lib/asciidoctor/converter/mdpp.rb -b mdpp -o "$DST" "$SRC"
+    ```
+
+## Fixture Tuning and Exact Matching
+- All tests perform strict string comparisons of output vs. expected fixtures.
+- Blank lines, trailing newlines, and precise spacing matter for passing tests.
+- When adding or modifying fixtures, use the diff in `rspec` output to identify mismatches and adjust the expected file accordingly.
+- The converter updates are synchronized with fixture tweaks in each feature commit to ensure consistency.
+
 Happy Converting!
+
+## CLI Wrapper and Batch Conversion Script
+- A helper script resides at `scripts/convert-mdpp.sh` to invoke the MDPP converter over a directory tree.
+- Usage: `./scripts/convert-mdpp.sh <SRC_DIR> <OUT_DIR>`
+- It scans for `.adoc`/`.asciidoc` files under `SRC_DIR`, mirrors the directory structure in `OUT_DIR`, and runs:
+  ```bash
+  asciidoctor -r lib/asciidoctor/converter/mdpp.rb -b mdpp -o "$DST" "$SRC"
+  ```
+
+## Fixture Tuning and Exact Matching
+- Tests compare outputs strictly (including blank lines, trailing newlines, and spacing).
+- When creating or updating fixture files, inspect the `rspec` diff and adjust expected files to match the converter’s output exactly.
+- Fixture updates should accompany code changes in the same commit to keep tests green.
