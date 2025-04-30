@@ -5,3 +5,15 @@ This document tests images.
 image::https://upload.wikimedia.org/wikipedia/commons/a/a0/Tux.svg[Tux image,250,350]
 
 Here is an inline image: image:http://example.com/logo.png[Logo,100,50].
+
+Block test with local image and width attribute that uses percent units.
+
+image:images/explore-w177h273.jpg[pdfwidth="60%", width="60%"]
+
+Block test with local image and no attributes.
+
+image:images/explore-w177h273.jpg[]
+
+Block test with local image and a random attribute only.
+
+image:images/explore-w177h273.jpg[pdfwidth="60%"]

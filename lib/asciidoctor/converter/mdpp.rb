@@ -69,6 +69,7 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     rest_blocks.each do |blk|
       parts << convert(blk)
     end
+    # Join parts with blank lines
     parts.compact.join("\n\n")
   end
 
@@ -101,29 +102,46 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     if par.lines.size == 1 && par.lines.first.strip =~ /<!--\s*include:[^>]+-->/
       return par.lines.first.strip
     end
-    # If the paragraph contains an inline image macro, convert it manually
-    if par.lines.any? { |line| line.include? 'image:' } && par.lines.any? { |line| line.match(/image:[^\[]+\[[^\]]+\]/) }
+    # Convert any inline image macros in this paragraph
+    if par.lines.any? { |line| line.include? 'image:' }
       text = par.lines.join("\n")
-      # Replace inline image macros: image:src[alt[,width[,height]]]
-      text.gsub(/image:(\S+?)\[([^\]]+)\]/) do
-        src = $1
-        # Split parameters: alt, width, height
-        params = $2.split(',')
-        alt = params[0]
-        width = params[1]
-        height = params[2]
-        # Build style name (e.g., w250h350, w250, h350)
+      text.gsub(/image:(\S+?)\[([^\]]*)\]/) do
+        src = Regexp.last_match(1)
+        # Split attributes: handle named key="value" and positional params
+        positional = []
+        named = {}
+        Regexp.last_match(2).split(',').map(&:strip).each do |param|
+          next if param.empty?
+          if param.include?('=')
+            k, v = param.split('=', 2)
+            # strip surrounding quotes
+            v = v.gsub(/^"|"$|^'|'$/, '')
+            named[k] = v
+          else
+            positional << param
+          end
+        end
+        # Determine alt text and dimensions
+        alt = positional[0] || ''
+        width = named['width'] || positional[1]
+        height = named['height'] || positional[2]
+        # Build style name: numeric or percentage
         style_parts = []
-        style_parts << "w#{width}" if width && !width.empty?
-        style_parts << "h#{height}" if height && !height.empty?
+        if width && !width.empty?
+          w = width.to_s
+          style_parts << (w.end_with?('%') ? "w#{w.chomp('%')}percent" : "w#{w}")
+        end
+        if height && !height.empty?
+          h = height.to_s
+          style_parts << (h.end_with?('%') ? "h#{h.chomp('%')}percent" : "h#{h}")
+        end
         style = style_parts.join
-        # Build image markdown
+        # Assemble Markdown image
         img = "![#{alt}](#{src})"
-        # Prepend style comment if dimensions given
         style.empty? ? img : "<!-- style:#{style} -->#{img}"
       end
     else
-      # Process inline macros (anchors, xrefs, etc.)
+      # No inline image macros: render paragraph content normally
       par.content
     end
   end
@@ -165,23 +183,29 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     end
   end
   
-  # Render a block-level image as a Markdown image with optional dimensions
+  # Render a block-level or inline image as a Markdown image with optional dimensions
   def convert_image(node)
-    # alt text or title (fallback to first positional attribute)
-    alt = node.attr('alt') || node.attr('title') || node.attributes[1] || ''
-    # image source URL or path: use node.target for inline images, block images store in attribute
+    # Determine alternate text: use explicit first positional attribute if provided; otherwise, no alt text
+    alt = node.attributes.key?(1) ? node.attributes[1].to_s : ''
+    # Determine source URL or path
     src = node.inline? ? node.target : node.attr('target')
-    # dimensions (fallback to positional attributes if named not present)
+    # Extract width and height (may include percentage units)
     width = node.attr('width') || node.attributes[2]
     height = node.attr('height') || node.attributes[3]
-    # Build style name for dimensions (e.g., w250h350, w250, h350)
+    # Build style name: handle numeric and percentage dimensions
     style_parts = []
-    style_parts << "w#{width}" if width
-    style_parts << "h#{height}" if height
+    if width
+      w = width.to_s
+      style_parts << (w.end_with?('%') ? "w#{w.chomp('%')}percent" : "w#{w}")
+    end
+    if height
+      h = height.to_s
+      style_parts << (h.end_with?('%') ? "h#{h.chomp('%')}percent" : "h#{h}")
+    end
     style = style_parts.join
-    # Build image markdown
+    # Assemble Markdown image
     img = "![#{alt}](#{src})"
-    # Prepend style comment if any dimension given
+    # Prepend style comment only if dimensions were specified
     style.empty? ? img : "<!-- style:#{style} -->#{img}"
   end
 
