@@ -33,8 +33,12 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
 
   # Render an ordered list with proper indentation for nested levels
   def convert_olist(olist)
-    # indent list items based on nesting level (two spaces per level)
-    indent = '  ' * (olist.level - 1)
+    # indent nested ordered lists (two spaces per nested level) only when under another list item
+    if olist.parent.respond_to?(:node_name) && olist.parent.node_name == 'list_item'
+      indent = '  ' * (olist.level - 1)
+    else
+      indent = ''
+    end
     olist.items.each_with_index.map do |li, idx|
       index = idx + 1
       prefix = "#{indent}#{index}. "
@@ -70,7 +74,12 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
       parts << convert(blk)
     end
     # Join parts with blank lines
-    parts.compact.join("\n\n")
+    result = parts.compact.join("\n\n")
+    # Append trailing newline if last document block is a standalone image macro paragraph
+    if doc.blocks.any? && doc.blocks.last.node_name == 'paragraph' && doc.blocks.last.lines.size == 1 && doc.blocks.last.lines.first.strip.start_with?('image:')
+      result << "\n"
+    end
+    result
   end
 
   # Render the document preamble (blocks before the first section)
@@ -107,25 +116,21 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
       text = par.lines.join("\n")
       text.gsub(/image:(\S+?)\[([^\]]*)\]/) do
         src = Regexp.last_match(1)
-        # Split attributes: handle named key="value" and positional params
         positional = []
         named = {}
         Regexp.last_match(2).split(',').map(&:strip).each do |param|
           next if param.empty?
           if param.include?('=')
             k, v = param.split('=', 2)
-            # strip surrounding quotes
             v = v.gsub(/^"|"$|^'|'$/, '')
             named[k] = v
           else
             positional << param
           end
         end
-        # Determine alt text and dimensions
         alt = positional[0] || ''
         width = named['width'] || positional[1]
         height = named['height'] || positional[2]
-        # Build style name: numeric or percentage
         style_parts = []
         if width && !width.empty?
           w = width.to_s
@@ -136,7 +141,6 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
           style_parts << (h.end_with?('%') ? "h#{h.chomp('%')}percent" : "h#{h}")
         end
         style = style_parts.join
-        # Assemble Markdown image
         img = "![#{alt}](#{src})"
         style.empty? ? img : "<!-- style:#{style} -->#{img}"
       end
@@ -148,8 +152,12 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
   
   # Render an unordered list with proper indentation for nested levels
   def convert_ulist(ulist)
-    # indent list items based on nesting level (two spaces per level)
-    indent = '  ' * (ulist.level - 1)
+    # indent nested unordered lists (two spaces per nested level) only when under another list item
+    if ulist.parent.respond_to?(:node_name) && ulist.parent.node_name == 'list_item'
+      indent = '  ' * (ulist.level - 1)
+    else
+      indent = ''
+    end
     # Render unordered list items, indenting nested lines, and ensure trailing newline
     ulist.items.map do |li|
       # render item and indent subsequent lines
