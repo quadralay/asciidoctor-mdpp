@@ -24,6 +24,25 @@ This document summarizes key workflows, conventions, and architectural notes for
 ## Helpful Tips
 - Use interactive inspect scripts (e.g., throwaway `inspect_*.rb`) to explore Asciidoctor AST nodes, then delete those scripts before committing.
 - Keep commits small and focused: fix root causes, update only relevant files.
+ 
+- Programmatically, you can invoke the converter from Ruby:
+  ```ruby
+  require 'asciidoctor/converter/mdpp'
+  output = Asciidoctor.convert_file(
+    'input.adoc',
+    backend:     'mdpp',
+    safe:        :safe,
+    require:     'asciidoctor/converter/mdpp',
+    attributes:  { 'outfilesuffix' => '.md' },
+    header_footer: true,
+    to_file:       false
+  )
+  ```
+ 
+- From the shell:
+  ```bash
+  asciidoctor -r lib/asciidoctor/converter/mdpp.rb -b mdpp -o output.md input.adoc
+  ```
 
 ## CLI Wrapper and Batch Conversion Script
 - A helper script lives at `scripts/convert-mdpp.sh` to run the MDPP converter recursively over a directory tree.
@@ -32,6 +51,13 @@ This document summarizes key workflows, conventions, and architectural notes for
     ```bash
     asciidoctor -r lib/asciidoctor/converter/mdpp.rb -b mdpp -o "$DST" "$SRC"
     ```
+
+## Single-File Conversion Script
+- A helper script at `scripts/convert-mdpp-file.sh` converts a single AsciiDoc file to Markdown++ side-by-side.
+  - Usage: `./scripts/convert-mdpp-file.sh <INPUT.adoc>`
+  - Verifies the file exists and has a `.adoc` or `.asciidoc` extension.
+  - Outputs a `.md` file alongside the source with the same basename.
+  - Ensures the output ends with a trailing newline for strict fixture matching.
 
 ## Fixture Tuning and Exact Matching
 - All tests perform strict string comparisons of output vs. expected fixtures.
