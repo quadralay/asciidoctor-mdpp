@@ -19,7 +19,8 @@ CONVERTER="$PROJECT_ROOT/lib/asciidoctor/converter/mdpp.rb"
 find "$SRC_DIR" -type f '(' -iname '*.adoc' -o -iname '*.asciidoc' ')' -print0 |
 while IFS= read -r -d '' src; do
   rel="${src#$SRC_DIR/}"
-  dst="$OUT_DIR/${rel%.*}.mdpp"
+  # set output file extension to .md for Markdown++ output
+  dst="$OUT_DIR/${rel%.*}.md"
   mkdir -p "$(dirname "$dst")"
 
   # show progress
