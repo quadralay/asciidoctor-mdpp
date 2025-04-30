@@ -220,6 +220,12 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
 
   # Render an inline image using the same logic as block-level image
   alias convert_inline_image convert_image
+
+  # Render inline quoted text (e.g., *text*) as Markdown++ strong syntax
+  def convert_inline_quoted(node)
+    # Always use double asterisks to denote quoted text
+    "**#{node.text}**"
+  end
   
   # Render an admonition block as a Markdown++ styled block
   # Emit a style comment and a blockquote for each content line

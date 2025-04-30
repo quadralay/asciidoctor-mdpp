@@ -65,4 +65,9 @@ RSpec.describe MarkdownPPConverter do
     expect(convert_sample('includes.adoc'))
       .to eq File.read(FIXTURES.join('expected', 'includes.md'))
   end
+  
+  it 'renders inline quoted text' do
+    expect(convert_sample('inline_quoted.adoc'))
+      .to eq File.read(FIXTURES.join('expected', 'inline_quoted.md'))
+  end
 end
