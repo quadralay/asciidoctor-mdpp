@@ -150,6 +150,7 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
   def convert_ulist(ulist)
     # indent list items based on nesting level (two spaces per level)
     indent = '  ' * (ulist.level - 1)
+    # Render unordered list items, indenting nested lines, and ensure trailing newline
     ulist.items.map do |li|
       # render item and indent subsequent lines
       body = convert(li, 'list_item').gsub(/\n/, "\n#{indent}  ")

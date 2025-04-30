@@ -18,4 +18,3 @@ Block test with local image and no attributes.
 Block test with local image and a random attribute only.
 
 ![](images/explore-w177h273.jpg)
-\ No newline at end of file
