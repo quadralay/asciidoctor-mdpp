@@ -92,10 +92,14 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
   def convert_section(sec)
     # Build the Markdown header line
     header_line = '#' * sec.level + ' ' + sec.title
-    # Start with optional anchor comment
+    # Start with optional anchor comment for explicit anchors
     output = ''
-    if sec.attributes.key?('id')
-      output << "<!-- ##{sec.id} -->\n"
+    # Include comment only when section id was explicitly set (does not begin with auto-generated prefix)
+    id = sec.id.to_s
+    # Default id prefix as defined by document (defaults to '_')
+    prefix = sec.document.attributes['idprefix'] || '_'
+    if !id.empty? && !id.start_with?(prefix)
+      output << "<!-- ##{id} -->\n"
     end
     # Add the header
     output << header_line
@@ -190,6 +194,35 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
       # Unknown inline anchor, omit
       ""
     end
+  end
+  
+  # Render a page break directive (<<<) as blank space (skip into next page)
+  def convert_page_break(node)
+    ''
+  end
+  
+  # Render a thematic break (''' delimited) as a horizontal rule
+  def convert_thematic_break(node)
+    '---'
+  end
+  
+  # Render a video macro as a YouTube iframe embed
+  def convert_video(node)
+    # Extract video id and dimensions
+    id = node.attr('target')
+    width = node.attr('width')
+    height = node.attr('height')
+    # Build iframe embed
+    lines = []
+    lines << '<iframe '
+    lines << "  width=\"#{width}\""
+    lines << "  height=\"#{height}\""
+    lines << "  src=\"https://www.youtube.com/embed/#{id}\""
+    lines << '  frameborder="0"'
+    lines << '  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"'
+    lines << '  allowfullscreen>'
+    lines << '</iframe>'
+    lines.join("\n")
   end
   
   # Render a block-level or inline image as a Markdown image with optional dimensions
@@ -291,10 +324,26 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     lines.join("\n")
   end
 
-  # Render a listing block (---- delimited) by converting its content to headings and paragraphs
-  def convert_listing(node)
+  # Render a literal block (.... delimited) as a code fence
+  def convert_literal(node)
     lines = node.lines
-    # Group content by blank lines to separate paragraphs or headings
+    # Wrap literal block in Markdown++ code fence
+    "```\n" + lines.join("\n") + "\n```"
+  end
+
+  # Render a listing block (---- delimited) or source blocks as Markdown++ code fences
+  def convert_listing(node)
+    # Simple listing blocks outside of example context: no language code fence
+    if node.style == 'listing' && node.parent.node_name != 'example'
+      return "```\n" + node.lines.join("\n") + "\n```"
+    end
+    # Named source code fence outside of example context: include language
+    if node.style == 'source' && node.parent.node_name != 'example'
+      lang = node.attr('language') || node.attributes[2]
+      return "```#{lang}\n" + node.lines.join("\n") + "\n```"
+    end
+    # Fallback: convert content groups into paragraphs or headings
+    lines = node.lines
     groups = []
     current = []
     lines.each do |line|
@@ -306,7 +355,6 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
       end
     end
     groups << current unless current.empty?
-    # Convert each group: single-line headings or paragraphs
     parts = groups.map do |group|
       if group.size == 1 && (m = group[0].match(/^(=+)\s*(.*)/))
         level = m[1].length

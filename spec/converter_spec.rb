@@ -73,6 +73,31 @@ RSpec.describe MarkdownPPConverter do
   
   it 'renders inline breaks' do
     expect(convert_sample('line-break.adoc'))
-      .to eq File.read(FIXTURES.join('expected', 'inline-break.md'))
+      .to eq File.read(FIXTURES.join('expected', 'line-break.md'))
+  end
+  
+  it 'renders anchors' do
+    expect(convert_sample('anchors.adoc'))
+      .to eq File.read(FIXTURES.join('expected', 'anchors.md'))
+  end
+  
+  it 'renders code blocks' do
+    expect(convert_sample('code-blocks.adoc'))
+      .to eq File.read(FIXTURES.join('expected', 'code-blocks.md'))
+  end
+  
+  it 'renders page breaks' do
+    expect(convert_sample('page-break.adoc'))
+      .to eq File.read(FIXTURES.join('expected', 'page-break.md'))
+  end
+  
+  it 'renders thematic breaks' do
+    expect(convert_sample('thematic-break.adoc'))
+      .to eq File.read(FIXTURES.join('expected', 'thematic-break.md'))
+  end
+  
+  it 'renders videos' do
+    expect(convert_sample('videos.adoc'))
+      .to eq File.read(FIXTURES.join('expected', 'videos.md'))
   end
 end
