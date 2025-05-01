@@ -14,6 +14,7 @@ Here’s a top‐level introduction before the list.
   - Level 2 item A.2
 - Level 1 item B
 
+<!-- #transform_types -->
 ### Transform Type
 
 Each checkbox sets a different number of points when you click “Set Points”

@@ -1,0 +1,9 @@
+= Sample Document – Videos
+
+This document tests videos.
+
+== Test Section
+
+Youtube video embed:
+
+video::D4QoQWboM-U[youtube, width=660, height=375]

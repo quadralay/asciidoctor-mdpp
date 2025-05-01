@@ -1,0 +1,7 @@
+= Sample Document – Anchors
+
+This document tests anchors.
+
+== Test Section [[my_custom_anchor]]
+
+Normal paragraph.
