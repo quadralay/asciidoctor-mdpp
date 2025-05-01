@@ -43,6 +43,14 @@ This document summarizes key workflows, conventions, and architectural notes for
   ```bash
   asciidoctor -r lib/asciidoctor/converter/mdpp.rb -b mdpp -o output.md input.adoc
   ```
+- Byte-for-byte fixture matching: tests compare the full output (including trailing newlines). When changing newline behavior, trim or add newlines in expected fixtures (e.g., `truncate -s -1 spec/fixtures/expected/file.md`) instead of altering specs.
+- Rapid ad-hoc conversion checks: use a Ruby one-liner to preview converter output, for example:
+  ```bash
+  ruby -Ilib -r asciidoctor/converter/mdpp -e "puts Asciidoctor.convert_file('spec/fixtures/samples/your.adoc', backend: 'mdpp', safe: :safe, require: 'asciidoctor/converter/mdpp', header_footer: true)"
+  ```
+- Distinguish explicit vs. auto-generated anchors: Asciidoctor auto-prefixes IDs with the document’s `idprefix` (default `_`), so emit only user-defined anchors by checking `sec.id` against that prefix.
+- Handling new block types: for each new node (e.g., `page_break`, `thematic_break`, `video`), implement a `convert_<node>` in `mdpp.rb`, add sample and expected fixtures, and update the spec.
+- Logical, focused commits: group related changes into separate commits (fixtures, converter/spec updates, documentation) with clear, descriptive messages.
 
 ## CLI Wrapper and Batch Conversion Script
 - A helper script lives at `scripts/convert-mdpp.sh` to run the MDPP converter recursively over a directory tree.
