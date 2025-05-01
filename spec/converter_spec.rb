@@ -70,4 +70,9 @@ RSpec.describe MarkdownPPConverter do
     expect(convert_sample('inline_quoted.adoc'))
       .to eq File.read(FIXTURES.join('expected', 'inline_quoted.md'))
   end
+  
+  it 'renders inline breaks' do
+    expect(convert_sample('line-break.adoc'))
+      .to eq File.read(FIXTURES.join('expected', 'inline-break.md'))
+  end
 end

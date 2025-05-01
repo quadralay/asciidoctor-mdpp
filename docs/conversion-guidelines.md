@@ -47,3 +47,14 @@ This document captures key design decisions, assumptions, and limitations of the
 
 ---
 _These guidelines will evolve as new edge cases appear. Please document any future converter gotchas here._
+## Line Break Challenges
+
+- Asciidoctor normalizes trailing `+` line breaks differently in paragraphs vs. list items:
+  - Paragraph breaks (trailing `+`) appear in `par.lines` and are handled by `convert_paragraph` by joining lines after stripping the `+`.
+  - List-item breaks are absorbed by the parser (AST loses the second line), so `convert_list_item` sees only the first segment.
+- The only reliable way to recover list-item breaks is a minimal file-aware fallback in `convert_olist`:
+  1. Call `convert(li, 'list_item')`. If it yields an empty or whitespace-only body, then
+  2. Use `li.source_location` to get the file path and line number.
+  3. Read that raw source line, strip the trailing `+`, emit `warn "path:lineno: inline '+' break in list item is not supported; text following the '+' has been dropped"` to `STDERR`, and use the remaining text as the list item.
+- Do not attempt to preprocess or rewrite `reader.lines` for this, as it breaks nested blocks, tables, and other constructs.
+- For nested list indentation, always check whether `ulist.parent.node_name == 'list_item'` instead of trusting `ulist.level`, which can vary in non-list contexts.
