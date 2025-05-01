@@ -12,3 +12,14 @@ Line break within a list item:
 1. Draw a layer around the area you want to track +
 Next line of the list item.
 2. Choose the planar tracking parameters (translation, rotation, scale, shear and/or perspective)
+
+Line break within an ordered list item:
+
+. Click the Load Node Button: +
+image:UserGuide/en_US/images/flame_load_node.jpg[]+
+. Navigate to the saved '.mask' file and open it
+
+Line break within an admonition:
+
+NOTE: This section covers all Camera Solve features that are in Mocha Pro. +
+Mocha HitFilm users do not have access to this version. See Mocha User Guides in HitFilm for more details.

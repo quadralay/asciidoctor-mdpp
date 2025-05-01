@@ -42,10 +42,70 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     olist.items.each_with_index.map do |li, idx|
       index = idx + 1
       prefix = "#{indent}#{index}. "
-      # convert item and indent subsequent lines to align under the text
-      converted = convert(li, 'list_item')
-      body = converted.gsub(/\n/, "\n" + ' ' * prefix.length)
-      "#{prefix}#{body}"
+      # Attempt to recover inline breaks from raw source when AST loses continuation
+      raw_conv = nil
+      if li.respond_to?(:source_location) && (loc = li.source_location)
+        # Determine source file path (absolute if available, otherwise relative)
+        raw_path = loc.respond_to?(:file) && loc.file ? loc.file : loc.path
+        ln = loc.lineno
+        raw_lines = nil
+        if raw_path
+          if File.exist?(raw_path)
+            raw_lines = File.readlines(raw_path)
+          else
+            if (docfile = li.document.attr('docfile'))
+              base = File.dirname(docfile)
+              candidate = File.join(base, raw_path)
+              raw_lines = File.readlines(candidate) if File.exist?(candidate)
+            end
+          end
+        end
+        if raw_lines
+          # Check for trailing '+' on the first list-item line
+          first_line = raw_lines[ln - 1].chomp("\n")
+          if first_line.rstrip.end_with?('+')
+            # Collect all lines belonging to this list item continuation
+            i = ln - 1
+            segments = []
+            while i < raw_lines.size
+              line = raw_lines[i].chomp("\n")
+              # Stop at next list-item marker or blank line
+              break if line.lstrip =~ /^(?:\d+\.\s|\.\s)/ || line.strip.empty?
+              # Remove trailing '+' if present
+              seg = line.rstrip
+              seg = seg.chomp('+').rstrip if seg.end_with?('+')
+              segments << seg
+              i += 1
+            end
+            if segments.any?
+              # Determine marker prefix from the first segment
+              if (m = segments[0].match(/^\s*(?:\d+\.\s|\.\s)/))
+                marker = m[0]
+              else
+                marker = prefix
+              end
+              # Build recovered lines: first with marker, continuations indented
+              lines_out = []
+              # first segment text after marker
+              text0 = segments[0][marker.length..-1].lstrip
+              lines_out << "#{marker}#{text0}"
+              # subsequent segments
+              segments[1..-1].to_a.each do |seg|
+                lines_out << (' ' * marker.length) + seg.lstrip
+              end
+              raw_conv = lines_out.join("\n")
+            end
+          end
+        end
+      end
+      # Use recovered content if available, otherwise default conversion
+      if raw_conv
+        raw_conv
+      else
+        converted = convert(li, 'list_item')
+        body = converted.gsub(/\n/, "\n" + ' ' * prefix.length)
+        "#{prefix}#{body}"
+      end
     end.join("\n")
   end
 
@@ -115,10 +175,19 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
     if par.lines.size == 1 && par.lines.first.strip =~ /<!--\s*include:[^>]+-->/
       return par.lines.first.strip
     end
+    # Process raw lines to handle trailing '+' hard breaks
+    lines = par.lines.map do |line|
+      l = line.chomp("\n")
+      if l.rstrip.end_with?('+')
+        l.chomp('+')
+      else
+        l
+      end
+    end
+    text = lines.join("\n")
     # Convert any inline image macros in this paragraph
-    if par.lines.any? { |line| line.include? 'image:' }
-      text = par.lines.join("\n")
-      text.gsub(/image:(\S+?)\[([^\]]*)\]/) do
+    if text.include?('image:')
+      text = text.gsub(/image:(\S+?)\[([^\]]*)\]/) do
         src = Regexp.last_match(1)
         positional = []
         named = {}
@@ -148,10 +217,12 @@ class MarkdownPPConverter < Asciidoctor::Converter::Base
         img = "![#{alt}](#{src})"
         style.empty? ? img : "<!-- style:#{style} -->#{img}"
       end
-    else
-      # No inline image macros: render paragraph content normally
-      par.content
     end
+    # Convert inline xref anchors: <<id, text>> to Markdown++ links
+    text = text.gsub(/<<([^,>]+),\s*([^>]+?)>>/) { "[#{$2}](##{$1})" }
+    # Convert inline quoted text: *text* to bold **text**
+    text = text.gsub(/\*(.+?)\*/) { "**#{$1}**" }
+    text
   end
   
   # Render an unordered list with proper indentation for nested levels
