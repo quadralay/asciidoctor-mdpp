@@ -7,6 +7,7 @@ This document summarizes key workflows, conventions, and architectural notes for
 - All feature work is done TDD-style: start by adding or updating a sample in `spec/fixtures/samples` and its corresponding expected output in `spec/fixtures/expected`.
 - Update `spec/converter_spec.rb` to include tests for new fixture files.
 - Run `rspec` to verify all tests, then commit both code changes and fixture updates together.
+- When writing tests that rely on node source locations (e.g., for inline-break recovery in list items), load documents with `Asciidoctor.load_file(..., sourcemap: true)` and call `doc.convert` rather than using `Asciidoctor.convert_file`. This ensures `source_location` is populated on AST nodes.
 
 ## Converter Architecture
 - The core converter is `lib/asciidoctor/converter/mdpp.rb`, implementing a `convert(node, transform)` dispatch to `convert_<node>` methods.
@@ -32,6 +33,11 @@ This document summarizes key workflows, conventions, and architectural notes for
     'input.adoc',
     backend:     'mdpp',
     safe:        :safe,
+    # To enable recovery of source_location on nodes (e.g., for list-item inline-break tests),
+    # prefer using Asciidoctor.load_file with sourcemap: true:
+    #   doc = Asciidoctor.load_file('input.adoc', safe: :safe, sourcemap: true,
+    #     require: 'asciidoctor/converter/mdpp', backend: 'mdpp', header_footer: true)
+    #   output = doc.convert
     require:     'asciidoctor/converter/mdpp',
     attributes:  { 'outfilesuffix' => '.md' },
     header_footer: true,
