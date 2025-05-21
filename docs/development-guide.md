@@ -1,7 +1,7 @@
 <!-- docs/development-guide.md -->
 # Developer Guide
 
-This document summarizes key workflows, conventions, and architectural notes for contributors and Codex sessions.
+This document summarizes key workflows, conventions, and architectural notes for contributors and coding agent sessions.
 
 ## Testing and Fixtures
 - All feature work is done TDD-style: start by adding or updating a sample in `spec/fixtures/samples` and its corresponding expected output in `spec/fixtures/expected`.
@@ -20,7 +20,7 @@ This document summarizes key workflows, conventions, and architectural notes for
 - Please refer to those spec files when implementing or updating features.
 
 ## Documentation Updates
-- When workflow or conventions change, update `.codex/instructions.md` and `codex.md` to reflect the new process.
+- When workflow or conventions change, update this file to reflect the new process.
 
 ## Helpful Tips
 - Use interactive inspect scripts (e.g., throwaway `inspect_*.rb`) to explore Asciidoctor AST nodes, then delete those scripts before committing.
