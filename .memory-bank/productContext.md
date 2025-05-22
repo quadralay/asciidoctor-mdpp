@@ -43,7 +43,7 @@ This converter is designed for:
 - **Extensibility** - The system should accommodate future enhancements to both AsciiDoc and Markdown++
 
 ## Business Context
-WebWorks is developing this project as an open-source contribution to the technical documentation community. By publishing it on GitHub, WebWorks aims to:
+WebWorks - Quadralay Corporation is developing this project as an open-source contribution to the technical documentation community. By publishing it on GitHub, WebWorks - Quadralay Corporation aims to:
 - Support the broader documentation toolchain ecosystem
 - Enable more flexible documentation workflows
 - Demonstrate commitment to open-source development

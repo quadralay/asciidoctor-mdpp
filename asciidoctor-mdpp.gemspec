@@ -5,8 +5,8 @@ require_relative "lib/asciidoctor/mdpp/version"
 Gem::Specification.new do |spec|
   spec.name = "asciidoctor-mdpp"
   spec.version = Asciidoctor::Mdpp::VERSION
-  spec.authors = ["Quadralay Corporation"]
-  spec.email = ["oss@quadralay.com"]
+  spec.authors = ["WebWorks - Quadralay Corporation"]
+  spec.email = ["development@webworks.com"]
 
   spec.summary = "Ruby-based Asciidoctor converter for converting AsciiDoc files to Markdown++ files."
   spec.description = "Ruby-based Asciidoctor converter for converting AsciiDoc files to Markdown++ files."

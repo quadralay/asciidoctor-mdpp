@@ -57,14 +57,15 @@ The immediate development roadmap includes:
 3. **Error Reporting**: Add better error messages and warnings for problematic conversions
 4. **Performance Optimization**: Review and optimize source file lookups and processing
 5. **Documentation Completion**: Finalize documentation for open-source release
-6. **GitHub Preparation**: Completed preparation of the repository for public GitHub release by Quadralay Corporation.
+6. **GitHub Preparation**: Completed preparation of the repository for public GitHub release by WebWorks - Quadralay Corporation.
 
 ## Recent Changes
 
-- **Repository Preparation**: Updated `README.md`, created `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md`, updated `LICENSE.txt` and `asciidoctor-mdpp.gemspec` for open-source release, including copyright and author attribution to Quadralay Corporation.
+- **Repository Preparation**: Updated `README.md`, created `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md`, updated `LICENSE.txt` and `asciidoctor-mdpp.gemspec` for open-source release, including copyright and author attribution to WebWorks - Quadralay Corporation.
 - **Description Update**: Updated the gem's functional description in `gemspec`, `README.md`, `projectbrief.md`, and `productContext.md` to "Ruby-based Asciidoctor converter for converting AsciiDoc files to Markdown++ files."
 - **Cleanup**: Removed `codex.md` and the `.codex` directory.
 - **File Extension Clarification**: Clarified the use of the `.md` file extension for Markdown++ files and its backward compatibility benefits in `README.md`, `docs/mdpp-specification/overview.md`, and `productContext.md`.
+- **Company Name Standardization**: Standardized company name references to "WebWorks - Quadralay Corporation" across `LICENSE.txt`, `asciidoctor-mdpp.gemspec`, `projectbrief.md`, `progress.md`, `productContext.md`, `activeContext.md`, and `README.md`. Updated `gemspec` email to `development@webworks.com`.
 
 ## Current Challenges
 

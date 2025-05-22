@@ -7,7 +7,7 @@ Asciidoctor-MDPP is a Ruby-based Asciidoctor converter for converting AsciiDoc f
 The primary purpose of this project is to facilitate the conversion of technical documentation from AsciiDoc format to Markdown++ format, enabling users to leverage AsciiDoc's structured authoring capabilities while targeting systems that work with Markdown++.
 
 ## Status
-The gem is currently in active development by WebWorks and is planned to be published as an open-source project on GitHub. The core conversion functionality is implemented and working well, though there are some known challenges with specific AsciiDoc features.
+The gem is currently in active development by WebWorks - Quadralay Corporation and is planned to be published as an open-source project on GitHub. The core conversion functionality is implemented and working well, though there are some known challenges with specific AsciiDoc features.
 
 ## Goals
 - Provide a reliable and accurate conversion from AsciiDoc to Markdown++
