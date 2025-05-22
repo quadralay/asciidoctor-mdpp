@@ -1,7 +1,7 @@
 # Project Brief: Asciidoctor-MDPP
 
 ## Overview
-Asciidoctor-MDPP is a Ruby gem that provides a custom converter for transforming AsciiDoc documents into Markdown++ (MDPP), an enhanced variant of standard Markdown. It extends the Asciidoctor framework with specialized conversion capabilities to handle unique Markdown++ features while preserving document structure and formatting.
+Asciidoctor-MDPP is a Ruby-based Asciidoctor converter for converting AsciiDoc files to Markdown++ (MDPP) files. It provides a custom converter for transforming AsciiDoc documents into an enhanced variant of standard Markdown, extending the Asciidoctor framework with specialized conversion capabilities to handle unique Markdown++ features while preserving document structure and formatting.
 
 ## Purpose
 The primary purpose of this project is to facilitate the conversion of technical documentation from AsciiDoc format to Markdown++ format, enabling users to leverage AsciiDoc's structured authoring capabilities while targeting systems that work with Markdown++.

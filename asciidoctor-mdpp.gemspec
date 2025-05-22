@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ["Quadralay Corporation"]
   spec.email = ["oss@quadralay.com"]
 
-  spec.summary = "Convert Asciidoctor documents to Markdown++."
-  spec.description = "Ruby converter for Asciidoctor to Markdown++."
+  spec.summary = "Ruby-based Asciidoctor converter for converting AsciiDoc files to Markdown++ files."
+  spec.description = "Ruby-based Asciidoctor converter for converting AsciiDoc files to Markdown++ files."
   spec.homepage = "https://github.com/quadralay/asciidoctor-mdpp"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"

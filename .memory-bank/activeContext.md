@@ -57,11 +57,12 @@ The immediate development roadmap includes:
 3. **Error Reporting**: Add better error messages and warnings for problematic conversions
 4. **Performance Optimization**: Review and optimize source file lookups and processing
 5. **Documentation Completion**: Finalize documentation for open-source release
-6. **GitHub Preparation**: Completed preparation of the repository for public GitHub release by WebWorks.
+6. **GitHub Preparation**: Completed preparation of the repository for public GitHub release by Quadralay Corporation.
 
 ## Recent Changes
 
 - **Repository Preparation**: Updated `README.md`, created `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md`, updated `LICENSE.txt` and `asciidoctor-mdpp.gemspec` for open-source release, including copyright and author attribution to Quadralay Corporation.
+- **Description Update**: Updated the gem's functional description in `gemspec`, `README.md`, `projectbrief.md`, and `productContext.md` to "Ruby-based Asciidoctor converter for converting AsciiDoc files to Markdown++ files."
 - **Cleanup**: Removed `codex.md` and the `.codex` directory.
 
 ## Current Challenges

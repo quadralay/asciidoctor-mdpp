@@ -19,7 +19,7 @@ Markdown++ is an enhanced variant of standard Markdown that extends the basic sy
 These extensions make Markdown++ particularly well-suited for technical documentation while maintaining compatibility with basic Markdown parsers.
 
 ## How Asciidoctor-MDPP Solves the Problem
-Asciidoctor-MDPP bridges the gap between AsciiDoc's structured authoring capabilities and Markdown++'s publishing flexibility by:
+Asciidoctor-MDPP, a Ruby-based Asciidoctor converter for converting AsciiDoc files to Markdown++ files, bridges the gap between AsciiDoc's structured authoring capabilities and Markdown++'s publishing flexibility by:
 
 1. **Providing automated conversion** - Eliminating manual translation work
 2. **Preserving document structure** - Maintaining the hierarchy and relationships in the original AsciiDoc
