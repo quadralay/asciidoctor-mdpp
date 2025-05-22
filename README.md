@@ -1,39 +1,103 @@
-# Asciidoctor::Mdpp
+# Asciidoctor-MDPP
 
-TODO: Delete this and the text below, and describe your gem
+Asciidoctor-MDPP is a Ruby gem that provides a custom converter for transforming AsciiDoc documents into Markdown++ (MDPP), an enhanced variant of standard Markdown. It extends the Asciidoctor framework with specialized conversion capabilities to handle unique Markdown++ features while preserving document structure and formatting.
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/asciidoctor/mdpp`. To experiment with that code, run `bin/console` for an interactive prompt.
+## Purpose
+
+The primary purpose of this project is to facilitate the conversion of technical documentation from AsciiDoc format to Markdown++ format, enabling users to leverage AsciiDoc's structured authoring capabilities while targeting systems that work with Markdown++.
+
+## Features
+
+*   **Automated Conversion**: Seamlessly convert AsciiDoc to Markdown++.
+*   **Markdown++ Extensions**: Supports multiline tables, style tags, and file includes.
+*   **High Fidelity Output**: Preserves document structure and formatting.
+*   **Batch Processing**: Convert entire documentation sets with CLI tools.
+*   **Asciidoctor Integration**: Works with standard Asciidoctor toolchains.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+Add this line to your application's Gemfile:
 
-Install the gem and add to the application's Gemfile by executing:
-
-```bash
-bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+```ruby
+gem 'asciidoctor-mdpp'
 ```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+And then execute:
 
 ```bash
-gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+bundle install
+```
+
+Or install it yourself as:
+
+```bash
+gem install asciidoctor-mdpp
 ```
 
 ## Usage
 
-TODO: Write usage instructions here
+### Command Line Interface (CLI)
+
+You can convert a single AsciiDoc file to Markdown++ using the provided script:
+
+```bash
+./scripts/convert-mdpp-file.sh input.adoc
+```
+
+Or using Asciidoctor directly:
+
+```bash
+asciidoctor -r lib/asciidoctor/converter/mdpp.rb -b mdpp -o output.md input.adoc
+```
+
+For batch conversion of all `.adoc` files in a directory:
+
+```bash
+./scripts/convert-mdpp.sh <SOURCE_DIR> <OUTPUT_DIR>
+```
+
+### Programmatic Usage
+
+```ruby
+require 'asciidoctor/converter/mdpp'
+
+# Option 1: Direct conversion
+output = Asciidoctor.convert_file(
+  'input.adoc',
+  backend: 'mdpp',
+  safe: :safe,
+  require: 'asciidoctor/converter/mdpp',
+  attributes: { 'outfilesuffix' => '.md' },
+  header_footer: true,
+  to_file: false
+)
+
+# Option 2: Two-step conversion (for source locations, recommended for complex docs)
+doc = Asciidoctor.load_file(
+  'input.adoc',
+  safe: :safe,
+  sourcemap: true,
+  require: 'asciidoctor/converter/mdpp',
+  backend: 'mdpp',
+  header_footer: true
+)
+output = doc.convert
+```
 
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `lib/asciidoctor/mdpp/version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/asciidoctor-mdpp.
+Bug reports and pull requests are welcome on GitHub at [https://github.com/quadralay/asciidoctor-mdpp](https://github.com/quadralay/asciidoctor-mdpp). This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+
+## About WebWorks
+
+Asciidoctor-MDPP is developed by WebWorks as an open-source contribution to the technical documentation community.

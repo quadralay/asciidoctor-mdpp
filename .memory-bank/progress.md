@@ -46,7 +46,7 @@ The following features have been successfully implemented:
 - [ ] Comprehensive usage documentation
 - [ ] CLI improvements for batch processing
 - [ ] Configuration options for customizing conversion behavior
-- [ ] Prepare for open-source GitHub release
+- [x] Prepare for open-source GitHub release (including copyright and author attribution to Quadralay Corporation)
 
 ## Current Status
 

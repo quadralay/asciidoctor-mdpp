@@ -57,7 +57,12 @@ The immediate development roadmap includes:
 3. **Error Reporting**: Add better error messages and warnings for problematic conversions
 4. **Performance Optimization**: Review and optimize source file lookups and processing
 5. **Documentation Completion**: Finalize documentation for open-source release
-6. **GitHub Preparation**: Prepare the repository for public GitHub release by WebWorks
+6. **GitHub Preparation**: Completed preparation of the repository for public GitHub release by WebWorks.
+
+## Recent Changes
+
+- **Repository Preparation**: Updated `README.md`, created `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md`, updated `LICENSE.txt` and `asciidoctor-mdpp.gemspec` for open-source release, including copyright and author attribution to Quadralay Corporation.
+- **Cleanup**: Removed `codex.md` and the `.codex` directory.
 
 ## Current Challenges
 
