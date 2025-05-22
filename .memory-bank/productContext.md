@@ -9,7 +9,7 @@ Without a reliable converter, authors would be forced to either:
 3. Use standard Markdown output (losing Markdown++'s enhanced capabilities)
 
 ## What is Markdown++?
-Markdown++ is an enhanced variant of standard Markdown that extends the basic syntax with additional features:
+Markdown++ is an enhanced variant of standard Markdown that extends the basic syntax with additional features. Importantly, Markdown++ files use the standard `.md` file extension to ensure backward compatibility with standard Markdown parsers.
 
 1. **Multiline tables** - Tables that can contain complex content spanning multiple lines, including lists, code blocks, and other Markdown elements
 2. **Style tags** - HTML comment-based syntax for applying custom styles to content (e.g., `<!-- style:AdmonitionNote -->`)

@@ -64,6 +64,7 @@ The immediate development roadmap includes:
 - **Repository Preparation**: Updated `README.md`, created `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md`, updated `LICENSE.txt` and `asciidoctor-mdpp.gemspec` for open-source release, including copyright and author attribution to Quadralay Corporation.
 - **Description Update**: Updated the gem's functional description in `gemspec`, `README.md`, `projectbrief.md`, and `productContext.md` to "Ruby-based Asciidoctor converter for converting AsciiDoc files to Markdown++ files."
 - **Cleanup**: Removed `codex.md` and the `.codex` directory.
+- **File Extension Clarification**: Clarified the use of the `.md` file extension for Markdown++ files and its backward compatibility benefits in `README.md`, `docs/mdpp-specification/overview.md`, and `productContext.md`.
 
 ## Current Challenges
 
