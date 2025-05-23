@@ -16,7 +16,9 @@ The primary purpose of this project is to facilitate the conversion of technical
 
 ## Installation
 
-Add this line to your application's Gemfile:
+The `asciidoctor-mdpp` gem is available on [RubyGems.org](https://rubygems.org/).
+
+To install it, add this line to your application's `Gemfile`:
 
 ```ruby
 gem 'asciidoctor-mdpp'
@@ -28,7 +30,7 @@ And then execute:
 bundle install
 ```
 
-Or install it yourself as:
+Alternatively, you can install it directly from your terminal:
 
 ```bash
 gem install asciidoctor-mdpp
